@@ -264,11 +264,22 @@ You can use HTML tags like:
                     loadNotes();
                 } else {
                     console.error('Could not find notes object in index.html');
-                    showMessage('Could not load notes from index.html', 'error');
+                    showMessage('Could not load notes from index.html. Make sure index.html is in the same folder.', 'error');
                 }
             } catch (error) {
                 console.error('Error loading notes:', error);
-                showMessage('Error loading notes: ' + error.message, 'error');
+                
+                // If fetch fails (likely due to CORS with local files), show instructions
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    showMessage(`
+                        <strong>Local File Access Issue</strong><br>
+                        To use the admin interface with local files, you need to serve them through a local server.<br><br>
+                        <strong>Option 1:</strong> Use the live site at <a href="https://beastnyc.github.io/admin.html" target="_blank">https://beastnyc.github.io/admin.html</a><br>
+                        <strong>Option 2:</strong> Start a local server: <code>python -m http.server 8000</code> then visit <a href="http://localhost:8000/admin.html" target="_blank">http://localhost:8000/admin.html</a>
+                    `, 'error');
+                } else {
+                    showMessage('Error loading notes: ' + error.message, 'error');
+                }
             }
         }
 

@@ -877,40 +877,15 @@
             body.className = 'note-body';
             body.innerHTML = note.content;
 
-            // Add backlinks if they exist
-            if (note.backlinks && note.backlinks.length > 0) {
-                const backlinksSection = document.createElement('div');
-                backlinksSection.className = 'backlinks';
-                backlinksSection.innerHTML = `
-                    <h3>Referenced by</h3>
-                    ${note.backlinks.map(link => `<a href="#" class="backlink" data-note="${link.toLowerCase().replace(/\s+/g, '-')}">${link}</a>`).join('')}
-                `;
-                body.appendChild(backlinksSection);
-            }
-
             // Add metadata at the bottom if available
-            if (note.lastModified || note.intersections) {
+            if (note.lastModified) {
                 const meta = document.createElement('div');
                 meta.className = 'note-meta';
                 
-                if (note.lastModified) {
-                    const lastModified = document.createElement('div');
-                    lastModified.className = 'last-modified';
-                    lastModified.innerHTML = `<span>📅</span> ${note.lastModified}`;
-                    meta.appendChild(lastModified);
-                }
-                
-                if (note.intersections && note.intersections.length > 0) {
-                    const tags = document.createElement('div');
-                    tags.className = 'intersection-tags';
-                    note.intersections.forEach(tag => {
-                        const tagElement = document.createElement('span');
-                        tagElement.className = 'intersection-tag';
-                        tagElement.textContent = tag;
-                        tags.appendChild(tagElement);
-                    });
-                    meta.appendChild(tags);
-                }
+                const lastModified = document.createElement('div');
+                lastModified.className = 'last-modified';
+                lastModified.innerHTML = `<span>📅</span> ${note.lastModified}`;
+                meta.appendChild(lastModified);
                 
                 body.appendChild(meta);
             }
@@ -1126,26 +1101,6 @@
                         matches.push('content');
                     }
 
-                    // Search in intersections/tags
-                    if (note.intersections) {
-                        note.intersections.forEach(tag => {
-                            if (tag.toLowerCase().includes(searchTerm)) {
-                                score += 3;
-                                matches.push('tag');
-                            }
-                        });
-                    }
-
-                    // Search in backlinks
-                    if (note.backlinks) {
-                        note.backlinks.forEach(link => {
-                            if (link.toLowerCase().includes(searchTerm)) {
-                                score += 2;
-                                matches.push('backlink');
-                            }
-                        });
-                    }
-
                     if (score > 0) {
                         results.push({
                             noteId,
@@ -1187,8 +1142,6 @@
                                 <div style="font-size: 12px; color: var(--text-muted);">
                                     ${result.matches.includes('title') ? '📝 Title' : ''}
                                     ${result.matches.includes('content') ? '📄 Content' : ''}
-                                    ${result.matches.includes('tag') ? '🏷️ Tag' : ''}
-                                    ${result.matches.includes('backlink') ? '🔗 Link' : ''}
                                 </div>
                             </div>
                             <div style="

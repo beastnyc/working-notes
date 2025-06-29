@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working Notes - Admin</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+            line-height: 1.6;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #ff6b35;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #ff6b35;
+        }
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .btn {
+            background: #ff6b35;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background: #e55a2b;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+        .notes-list {
+            margin-top: 40px;
+            border-top: 2px solid #e9ecef;
+            padding-top: 20px;
+        }
+        .note-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b35;
+        }
+        .note-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .note-meta {
+            font-size: 14px;
+            color: #666;
+        }
+        .note-actions {
+            margin-top: 10px;
+        }
+        .note-actions button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .note-actions button:hover {
+            background: #5a6268;
+        }
+        .help-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .preview {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .preview h3 {
+            margin-top: 0;
+            color: #ff6b35;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            border-bottom-color: #ff6b35;
+            color: #ff6b35;
+            font-weight: 600;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Working Notes Admin</h1>
+        
+        <div id="message"></div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('add')">Add New Note</div>
+            <div class="tab" onclick="switchTab('manage')">Manage Notes</div>
+            <div class="tab" onclick="switchTab('export')">Export/Import</div>
+        </div>
+        
+        <!-- Add Note Tab -->
+        <div id="add-tab" class="tab-content active">
+            <form id="noteForm">
+                <div class="form-group">
+                    <label for="title">Note Title *</label>
+                    <input type="text" id="title" name="title" required>
+                    <div class="help-text">This will be used to generate the note ID automatically</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="content">Content *</label>
+                    <textarea id="content" name="content" required placeholder="Write your note content here...
+
+You can use HTML tags like:
+&lt;p&gt;Paragraphs&lt;/p&gt;
+&lt;h2&gt;Headings&lt;/h2&gt;
+&lt;ul&gt;&lt;li&gt;Lists&lt;/li&gt;&lt;/ul&gt;
+&lt;a href=&quot;#&quot; class=&quot;note-link&quot; data-note=&quot;note-id&quot;&gt;Links to other notes&lt;/a&gt;"></textarea>
+                    <div class="help-text">Use HTML tags for formatting. Link to other notes using: &lt;a href="#" class="note-link" data-note="note-id"&gt;Link text&lt;/a&gt;</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="linkedNotes">Notes this references (comma-separated)</label>
+                    <input type="text" id="linkedNotes" name="linkedNotes" placeholder="Evergreen notes, Deep work">
+                    <div class="help-text">These notes will be linked from this note</div>
+                </div>
+                
+                <button type="submit" class="btn">Add Note</button>
+                <button type="button" class="btn btn-secondary" onclick="previewNote()">Preview</button>
+            </form>
+            
+            <div id="preview" class="preview" style="display: none;">
+                <h3>Preview</h3>
+                <div id="previewContent"></div>
+            </div>
+        </div>
+        
+        <!-- Manage Notes Tab -->
+        <div id="manage-tab" class="tab-content">
+            <div class="notes-list">
+                <h2>📚 Current Notes</h2>
+                <button class="btn btn-secondary" onclick="loadNotes()">Refresh List</button>
+                <div id="notesList"></div>
+            </div>
+        </div>
+        
+        <!-- Export/Import Tab -->
+        <div id="export-tab" class="tab-content">
+            <h2>📤 Export/Import Notes</h2>
+            <div class="form-group">
+                <label>Export Notes (JSON)</label>
+                <button class="btn" onclick="exportNotes()">Download Notes</button>
+                <div class="help-text">Download all notes as a JSON file for backup</div>
+            </div>
+            
+            <div class="form-group">
+                <label>Import Notes</label>
+                <input type="file" id="importFile" accept=".json">
+                <button class="btn btn-secondary" onclick="importNotes()">Import Notes</button>
+                <div class="help-text">Upload a JSON file to import notes (will replace current notes)</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load notes from index.html
+        let notes = {};
+        
+        async function loadNotesFromFile() {
+            try {
+                const response = await fetch('index.html');
+                const htmlContent = await response.text();
+                
+                // Extract the notes object from the HTML
+                const notesMatch = htmlContent.match(/const notes = \{([\s\S]*?)\};/);
+                
+                if (notesMatch) {
+                    // Create a safe way to evaluate the notes object
+                    const notesString = `{${notesMatch[1]}}`;
+                    
+                    // Use Function constructor for safer evaluation
+                    const notesFunction = new Function(`return ${notesString}`);
+                    notes = notesFunction();
+                    
+                    console.log('Loaded notes:', notes);
+                    loadNotes();
+                } else {
+                    console.error('Could not find notes object in index.html');
+                    showMessage('Could not load notes from index.html', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading notes:', error);
+                showMessage('Error loading notes: ' + error.message, 'error');
+            }
+        }
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Load notes if switching to manage tab
+            if (tabName === 'manage') {
+                loadNotes();
+            }
+        }
+
+        document.getElementById('noteForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const title = formData.get('title');
+            const content = formData.get('content');
+            const linkedNotes = formData.get('linkedNotes').split(',').map(link => link.trim()).filter(link => link);
+            
+            if (!title || !content) {
+                showMessage('Title and content are required!', 'error');
+                return;
+            }
+            
+            // Generate note ID from title
+            const noteId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            
+            // Add the new note
+            notes[noteId] = {
+                title,
+                lastModified: new Date().toISOString().split('T')[0],
+                content,
+                linkedNotes
+            };
+            
+            showMessage(`Note "${title}" added successfully! Note ID: ${noteId}`, 'success');
+            e.target.reset();
+            document.getElementById('preview').style.display = 'none';
+        });
+        
+        function previewNote() {
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            
+            if (!title || !content) {
+                showMessage('Please fill in title and content to preview', 'error');
+                return;
+            }
+            
+            const previewContent = document.getElementById('previewContent');
+            previewContent.innerHTML = `
+                <h2>${title}</h2>
+                <div>${content}</div>
+            `;
+            
+            document.getElementById('preview').style.display = 'block';
+        }
+        
+        function loadNotes() {
+            const notesList = document.getElementById('notesList');
+            if (Object.keys(notes).length === 0) {
+                notesList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No notes found. Try refreshing the page.</div>';
+                return;
+            }
+            
+            notesList.innerHTML = Object.entries(notes).map(([id, note]) => `
+                <div class="note-item">
+                    <div class="note-title">${note.title}</div>
+                    <div class="note-meta">
+                        ID: ${id} | Modified: ${note.lastModified}
+                    </div>
+                    <div class="note-actions">
+                        <button onclick="editNote('${id}')">Edit</button>
+                        <button onclick="deleteNote('${id}')">Delete</button>
+                        <button onclick="copyNoteId('${id}')">Copy ID</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function editNote(noteId) {
+            const note = notes[noteId];
+            if (!note) return;
+            
+            document.getElementById('title').value = note.title;
+            document.getElementById('content').value = note.content;
+            document.getElementById('linkedNotes').value = note.linkedNotes ? note.linkedNotes.join(', ') : '';
+            
+            // Switch to add tab
+            switchTab('add');
+            showMessage(`Editing note: ${note.title}`, 'success');
+        }
+        
+        function deleteNote(noteId) {
+            if (confirm(`Are you sure you want to delete "${notes[noteId].title}"?`)) {
+                delete notes[noteId];
+                loadNotes();
+                showMessage('Note deleted successfully!', 'success');
+            }
+        }
+        
+        function copyNoteId(noteId) {
+            navigator.clipboard.writeText(noteId).then(() => {
+                showMessage('Note ID copied to clipboard!', 'success');
+            });
+        }
+        
+        function exportNotes() {
+            const dataStr = JSON.stringify(notes, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'working-notes.json';
+            link.click();
+            URL.revokeObjectURL(url);
+            showMessage('Notes exported successfully!', 'success');
+        }
+        
+        function importNotes() {
+            const fileInput = document.getElementById('importFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showMessage('Please select a file to import', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedNotes = JSON.parse(e.target.result);
+                    notes = importedNotes;
+                    loadNotes();
+                    showMessage('Notes imported successfully!', 'success');
+                    fileInput.value = '';
+                } catch (error) {
+                    showMessage('Error importing notes: Invalid JSON file', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="${type}">${text}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+        
+        // Load notes from index.html when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNotesFromFile();
+        });
+    </script>
+</body>
+</html> 

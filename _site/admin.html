@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working Notes - Admin</title>
+    <!-- Add marked.js for proper markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+            line-height: 1.6;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #ff6b35;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #ff6b35;
+        }
+        textarea {
+            min-height: 300px;
+            resize: vertical;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            background: #fafafa;
+        }
+        .btn {
+            background: #ff6b35;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background: #e55a2b;
+        }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+        .notes-list {
+            margin-top: 40px;
+            border-top: 2px solid #e9ecef;
+            padding-top: 20px;
+        }
+        .note-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b35;
+        }
+        .note-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        .note-meta {
+            font-size: 14px;
+            color: #666;
+        }
+        .note-actions {
+            margin-top: 10px;
+        }
+        .note-actions button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .note-actions button:hover {
+            background: #5a6268;
+        }
+        .help-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .preview {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .preview h3 {
+            margin-top: 0;
+            color: #ff6b35;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            border-bottom-color: #ff6b35;
+            color: #ff6b35;
+            font-weight: 600;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        .editor-toolbar {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            flex-wrap: wrap;
+        }
+        
+        .editor-toolbar button {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .editor-toolbar button:hover {
+            background: #ff6b35;
+            color: white;
+            border-color: #ff6b35;
+        }
+        
+        .editor-toolbar button.active {
+            background: #ff6b35;
+            color: white;
+            border-color: #ff6b35;
+        }
+        
+        .preview-content {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            min-height: 100px;
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .preview-content h2 {
+            color: #ff6b35;
+            margin-top: 0;
+        }
+        
+        .preview-content strong {
+            font-weight: 600;
+        }
+        
+        .preview-content ul {
+            padding-left: 20px;
+        }
+        
+        .preview-content a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        
+        .preview-content a:hover {
+            text-decoration: underline;
+        }
+        
+        .preview-content p {
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+        
+        .preview-content h3 {
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        /* Markdown syntax highlighting */
+        .markdown-syntax {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .markdown-syntax h4 {
+            margin-top: 0;
+            color: #ff6b35;
+            margin-bottom: 10px;
+        }
+
+        .markdown-syntax code {
+            background: #e9ecef;
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: #d63384;
+        }
+
+        .markdown-syntax .example {
+            margin-bottom: 8px;
+            padding: 8px;
+            background: white;
+            border-radius: 4px;
+            border-left: 3px solid #ff6b35;
+        }
+
+        /* Split view for editor and preview */
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .editor-section, .preview-section {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .editor-section h3, .preview-section h3 {
+            margin-top: 0;
+            color: #ff6b35;
+            margin-bottom: 15px;
+        }
+
+        .live-preview {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .editor-toolbar {
+                flex-direction: column;
+            }
+            
+            .editor-toolbar button {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Working Notes Admin</h1>
+        
+        <div id="message"></div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('add')">Add New Note</div>
+            <div class="tab" onclick="switchTab('manage')">Manage Notes</div>
+            <div class="tab" onclick="switchTab('export')">Export/Import</div>
+        </div>
+        
+        <!-- Add Note Tab -->
+        <div id="add-tab" class="tab-content active">
+            <form id="noteForm">
+                <div class="form-group">
+                    <label for="title">Note Title *</label>
+                    <input type="text" id="title" name="title" required>
+                    <div class="help-text">This will be used to generate the note ID automatically</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="content">Content (Markdown) *</label>
+                    <div class="editor-toolbar">
+                        <button type="button" onclick="insertMarkdown('**', '**')" title="Bold">B</button>
+                        <button type="button" onclick="insertMarkdown('*', '*')" title="Italic">I</button>
+                        <button type="button" onclick="insertMarkdown('`', '`')" title="Code">`</button>
+                        <button type="button" onclick="insertHeading('#')" title="Heading 1">H1</button>
+                        <button type="button" onclick="insertHeading('##')" title="Heading 2">H2</button>
+                        <button type="button" onclick="insertHeading('###')" title="Heading 3">H3</button>
+                        <button type="button" onclick="insertLink()" title="Add Link">🔗</button>
+                        <button type="button" onclick="insertList()" title="Add List">📝</button>
+                        <button type="button" onclick="insertBlockquote()" title="Blockquote">💬</button>
+                        <button type="button" onclick="insertCodeBlock()" title="Code Block">```</button>
+                        <button type="button" onclick="toggleSplitView()" title="Toggle Split View">👁️</button>
+                    </div>
+                    <textarea id="content" name="content" required placeholder="Write your note in Markdown...
+
+# Heading 1
+## Heading 2
+
+**Bold text** and *italic text*
+
+- Bullet points
+- Another item
+
+[Link text](note-id)
+
+> Blockquote for important notes
+
+`inline code`
+
+```javascript
+// Code blocks
+console.log('Hello world');
+```
+
+Use [note-id] to link to other notes in your system."></textarea>
+                    <div class="help-text">Write in Markdown! Use the toolbar above or type markdown syntax directly.</div>
+                </div>
+
+                <!-- Markdown Syntax Reference -->
+                <div class="markdown-syntax">
+                    <h4>📖 Markdown Syntax Reference</h4>
+                    <div class="example">
+                        <strong>Headings:</strong> <code># H1</code> <code>## H2</code> <code>### H3</code>
+                    </div>
+                    <div class="example">
+                        <strong>Text:</strong> <code>**bold**</code> <code>*italic*</code> <code>`code`</code>
+                    </div>
+                    <div class="example">
+                        <strong>Lists:</strong> <code>- item</code> <code>1. item</code>
+                    </div>
+                    <div class="example">
+                        <strong>Links:</strong> <code>[text](note-id)</code> or <code>[note-id]</code> for automatic linking
+                    </div>
+                    <div class="example">
+                        <strong>Blockquotes:</strong> <code>> quoted text</code>
+                    </div>
+                    <div class="example">
+                        <strong>Code blocks:</strong> <code>```javascript</code> your code <code>```</code>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="linkedNotes">Notes this references (comma-separated)</label>
+                    <input type="text" id="linkedNotes" name="linkedNotes" placeholder="evergreen-notes, deep-work">
+                    <div class="help-text">These notes will be linked from this note</div>
+                </div>
+                
+                <button type="submit" class="btn">Add Note</button>
+                <button type="button" class="btn btn-secondary" onclick="previewNote()">Preview</button>
+                <button type="button" class="btn btn-secondary" onclick="editHomePage()">Edit Home Page</button>
+                <button type="button" class="btn btn-secondary" onclick="testServer()">Test Server</button>
+                <button type="button" class="btn btn-secondary" onclick="testSaveHomePage()">Test Save</button>
+            </form>
+            
+            <div id="preview" class="preview-content">
+                <h3>Preview</h3>
+                <div id="previewContent"></div>
+            </div>
+
+            <!-- Split View -->
+            <div id="splitView" class="editor-container" style="display: none;">
+                <div class="editor-section">
+                    <h3>📝 Editor</h3>
+                    <textarea id="splitEditor" placeholder="Write your markdown here..."></textarea>
+                </div>
+                <div class="preview-section">
+                    <h3>👁️ Live Preview</h3>
+                    <div id="livePreview" class="live-preview"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Manage Notes Tab -->
+        <div id="manage-tab" class="tab-content">
+            <div class="notes-list">
+                <h2>📚 Current Notes</h2>
+                <button class="btn btn-secondary" onclick="loadNotes()">Refresh List</button>
+                <div id="notesList"></div>
+            </div>
+        </div>
+        
+        <!-- Export/Import Tab -->
+        <div id="export-tab" class="tab-content">
+            <h2>📤 Export/Import Notes</h2>
+            <div class="form-group">
+                <label>Export Notes (JSON)</label>
+                <button class="btn" onclick="exportNotes()">Download Notes</button>
+                <div class="help-text">Download all notes as a JSON file for backup</div>
+            </div>
+            
+            <div class="form-group">
+                <label>Import Notes</label>
+                <input type="file" id="importFile" accept=".json">
+                <button class="btn btn-secondary" onclick="importNotes()">Import Notes</button>
+                <div class="help-text">Upload a JSON file to import notes (will replace current notes)</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configure marked.js for our needs
+        marked.setOptions({
+            breaks: true,
+            gfm: true
+        });
+
+        // Custom renderer to handle note links
+        const renderer = new marked.Renderer();
+        renderer.link = function(href, title, text) {
+            // Handle note links: [text](note-id) or [note-id]
+            if (href && !href.startsWith('http')) {
+                return `<a href="#" class="note-link" data-note="${href}">${text}</a>`;
+            }
+            return `<a href="${href}" title="${title || ''}">${text}</a>`;
+        };
+        marked.use({ renderer });
+
+        // Load notes from index.html
+        let notes = {};
+        
+        async function loadNotesFromFile() {
+            try {
+                const response = await fetch('index.html');
+                const htmlContent = await response.text();
+                
+                // Extract the notes object from the HTML
+                const notesMatch = htmlContent.match(/const notes = \{([\s\S]*?)\};/);
+                
+                if (notesMatch) {
+                    // Create a safe way to evaluate the notes object
+                    const notesString = `{${notesMatch[1]}}`;
+                    
+                    // Use Function constructor for safer evaluation
+                    const notesFunction = new Function(`return ${notesString}`);
+                    notes = notesFunction();
+                    
+                    console.log('Loaded notes:', notes);
+                    loadNotes();
+                } else {
+                    console.error('Could not find notes object in index.html');
+                    showMessage('Could not load notes from index.html. Make sure index.html is in the same folder.', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading notes:', error);
+                
+                // If fetch fails (likely due to CORS with local files), show instructions
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    showMessage(`
+                        <strong>Local File Access Issue</strong><br>
+                        To use the admin interface with local files, you need to serve them through a local server.<br><br>
+                        <strong>Option 1:</strong> Use the live site at <a href="https://beastnyc.github.io/admin.html" target="_blank">https://beastnyc.github.io/admin.html</a><br>
+                        <strong>Option 2:</strong> Start a local server: <code>python -m http.server 8000</code> then visit <a href="http://localhost:8000/admin.html" target="_blank">http://localhost:8000/admin.html</a>
+                    `, 'error');
+                } else {
+                    showMessage('Error loading notes: ' + error.message, 'error');
+                }
+            }
+        }
+
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+            
+            // Load notes if switching to manage tab
+            if (tabName === 'manage') {
+                loadNotes();
+            }
+        }
+
+        document.getElementById('noteForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const title = formData.get('title');
+            const content = formData.get('content');
+            const linkedNotes = formData.get('linkedNotes').split(',').map(link => link.trim()).filter(link => link);
+            
+            if (!title || !content) {
+                showMessage('Title and content are required!', 'error');
+                return;
+            }
+            
+            // Generate note ID from title
+            const noteId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+            
+            // Add the new note
+            notes[noteId] = {
+                title,
+                lastModified: new Date().toISOString().split('T')[0],
+                content: convertMarkdownToHTML(content),
+                linkedNotes
+            };
+            
+            showMessage(`Note "${title}" added successfully! Note ID: ${noteId}`, 'success');
+            e.target.reset();
+            document.getElementById('preview').style.display = 'none';
+        });
+        
+        function previewNote() {
+            console.log('Preview function called');
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            
+            console.log('Title:', title);
+            console.log('Content:', content);
+            
+            if (!title || !content) {
+                showMessage('Please fill in title and content to preview', 'error');
+                return;
+            }
+            
+            try {
+                const htmlContent = convertMarkdownToHTML(content);
+                console.log('Converted HTML:', htmlContent);
+                
+                const previewContent = document.getElementById('previewContent');
+                previewContent.innerHTML = `
+                    <h2>${title}</h2>
+                    <div>${htmlContent}</div>
+                `;
+                
+                document.getElementById('preview').style.display = 'block';
+                console.log('Preview should be visible now');
+                showMessage('Preview generated successfully! 👁️', 'success');
+            } catch (error) {
+                console.error('Error generating preview:', error);
+                showMessage('Error generating preview: ' + error.message, 'error');
+            }
+        }
+        
+        function loadNotes() {
+            const notesList = document.getElementById('notesList');
+            if (Object.keys(notes).length === 0) {
+                notesList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No notes found. Try refreshing the page.</div>';
+                return;
+            }
+            
+            // Create home page note entry
+            const homePageEntry = `
+                <div class="note-item" style="border-left-color: #28a745;">
+                    <div class="note-title">🏠 Working Notes (Home Page)</div>
+                    <div class="note-meta">
+                        ID: home | Special: Front page
+                    </div>
+                    <div class="note-actions">
+                        <button onclick="editHomePage()">Edit</button>
+                        <button onclick="previewHomePage()">Preview</button>
+                        <button onclick="copyNoteId('home')">Copy ID</button>
+                    </div>
+                </div>
+            `;
+            
+            // Create regular notes entries
+            const regularNotes = Object.entries(notes).map(([id, note]) => `
+                <div class="note-item">
+                    <div class="note-title">${note.title}</div>
+                    <div class="note-meta">
+                        ID: ${id} | Modified: ${note.lastModified}
+                    </div>
+                    <div class="note-actions">
+                        <button onclick="editNote('${id}')">Edit</button>
+                        <button onclick="deleteNote('${id}')">Delete</button>
+                        <button onclick="copyNoteId('${id}')">Copy ID</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            notesList.innerHTML = homePageEntry + regularNotes;
+        }
+        
+        function editNote(noteId) {
+            const note = notes[noteId];
+            if (!note) return;
+            
+            document.getElementById('title').value = note.title;
+            // Convert HTML back to markdown for editing
+            document.getElementById('content').value = convertHTMLToMarkdown(note.content);
+            document.getElementById('linkedNotes').value = note.linkedNotes ? note.linkedNotes.join(', ') : '';
+            
+            // Switch to add tab
+            switchTab('add');
+            showMessage(`Editing note: ${note.title}`, 'success');
+        }
+        
+        function deleteNote(noteId) {
+            if (confirm(`Are you sure you want to delete "${notes[noteId].title}"?`)) {
+                delete notes[noteId];
+                loadNotes();
+                showMessage('Note deleted successfully!', 'success');
+            }
+        }
+        
+        function copyNoteId(noteId) {
+            navigator.clipboard.writeText(noteId).then(() => {
+                showMessage('Note ID copied to clipboard!', 'success');
+            });
+        }
+        
+        function exportNotes() {
+            const dataStr = JSON.stringify(notes, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'working-notes.json';
+            link.click();
+            URL.revokeObjectURL(url);
+            showMessage('Notes exported successfully!', 'success');
+        }
+        
+        function importNotes() {
+            const fileInput = document.getElementById('importFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showMessage('Please select a file to import', 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const importedNotes = JSON.parse(e.target.result);
+                    notes = importedNotes;
+                    loadNotes();
+                    showMessage('Notes imported successfully!', 'success');
+                    fileInput.value = '';
+                } catch (error) {
+                    showMessage('Error importing notes: Invalid JSON file', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="${type}">${text}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        // Enhanced markdown editor functions
+        function insertMarkdown(before, after) {
+            const textarea = document.getElementById('content');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            
+            const replacement = before + selectedText + after;
+            textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+            textarea.focus();
+            
+            if (selectedText) {
+                textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
+            } else {
+                textarea.setSelectionRange(start + before.length, start + before.length);
+            }
+        }
+
+        function insertHeading(level) {
+            const textarea = document.getElementById('content');
+            const cursorPos = textarea.selectionStart;
+            const lineStart = textarea.value.lastIndexOf('\n', cursorPos - 1) + 1;
+            const lineEnd = textarea.value.indexOf('\n', cursorPos);
+            const lineEndPos = lineEnd === -1 ? textarea.value.length : lineEnd;
+            const currentLine = textarea.value.substring(lineStart, lineEndPos);
+            
+            if (!currentLine.startsWith('#')) {
+                const replacement = `${level} ${currentLine}`;
+                textarea.value = textarea.value.substring(0, lineStart) + replacement + textarea.value.substring(lineEndPos);
+                textarea.focus();
+                textarea.setSelectionRange(lineStart + replacement.length, lineStart + replacement.length);
+            }
+        }
+
+        function insertLink() {
+            const textarea = document.getElementById('content');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selectedText = textarea.value.substring(start, end);
+            
+            if (selectedText) {
+                const noteId = prompt('Enter the note ID to link to:');
+                if (noteId) {
+                    const replacement = `[${selectedText}](${noteId})`;
+                    textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+                    textarea.focus();
+                    textarea.setSelectionRange(start + replacement.length, start + replacement.length);
+                }
+            } else {
+                const linkText = prompt('Enter link text:');
+                const noteId = prompt('Enter the note ID to link to:');
+                if (linkText && noteId) {
+                    const replacement = `[${linkText}](${noteId})`;
+                    textarea.value = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+                    textarea.focus();
+                    textarea.setSelectionRange(start + replacement.length, start + replacement.length);
+                }
+            }
+        }
+
+        function insertList() {
+            const textarea = document.getElementById('content');
+            const cursorPos = textarea.selectionStart;
+            const replacement = '\n- List item\n- Another item\n- Third item';
+            textarea.value = textarea.value.substring(0, cursorPos) + replacement + textarea.value.substring(cursorPos);
+            textarea.focus();
+            textarea.setSelectionRange(cursorPos + replacement.length, cursorPos + replacement.length);
+        }
+
+        function insertBlockquote() {
+            const textarea = document.getElementById('content');
+            const cursorPos = textarea.selectionStart;
+            const replacement = '\n> Blockquote text here';
+            textarea.value = textarea.value.substring(0, cursorPos) + replacement + textarea.value.substring(cursorPos);
+            textarea.focus();
+            textarea.setSelectionRange(cursorPos + replacement.length, cursorPos + replacement.length);
+        }
+
+        function insertCodeBlock() {
+            const textarea = document.getElementById('content');
+            const cursorPos = textarea.selectionStart;
+            const replacement = '\n```\n// Your code here\n```';
+            textarea.value = textarea.value.substring(0, cursorPos) + replacement + textarea.value.substring(cursorPos);
+            textarea.focus();
+            textarea.setSelectionRange(cursorPos + replacement.length - 4, cursorPos + replacement.length - 4);
+        }
+
+        function toggleSplitView() {
+            const splitView = document.getElementById('splitView');
+            const isVisible = splitView.style.display !== 'none';
+            
+            if (isVisible) {
+                splitView.style.display = 'none';
+            } else {
+                // Copy content to split editor
+                const content = document.getElementById('content').value;
+                document.getElementById('splitEditor').value = content;
+                updateLivePreview();
+                splitView.style.display = 'grid';
+            }
+        }
+
+        function updateLivePreview() {
+            const content = document.getElementById('splitEditor').value;
+            const htmlContent = convertMarkdownToHTML(content);
+            document.getElementById('livePreview').innerHTML = htmlContent;
+        }
+
+        // Live preview updates
+        document.addEventListener('DOMContentLoaded', () => {
+            const splitEditor = document.getElementById('splitEditor');
+            if (splitEditor) {
+                splitEditor.addEventListener('input', updateLivePreview);
+            }
+        });
+
+        function convertMarkdownToHTML(markdown) {
+            // Process note links first: [note-id] -> [note-id](note-id)
+            let processedMarkdown = markdown.replace(/\[([a-z0-9-]+)\]/g, '[$1]($1)');
+            
+            // Use marked.js to convert to HTML
+            return marked.parse(processedMarkdown);
+        }
+
+        function convertHTMLToMarkdown(html) {
+            // This is a simplified conversion - for full conversion you'd want a library like turndown
+            let markdown = html;
+            
+            // Convert <strong> back to **
+            markdown = markdown.replace(/<strong>(.*?)<\/strong>/g, '**$1**');
+            
+            // Convert <em> back to *
+            markdown = markdown.replace(/<em>(.*?)<\/em>/g, '*$1*');
+            
+            // Convert <h2> back to ##
+            markdown = markdown.replace(/<h2>(.*?)<\/h2>/g, '## $1');
+            
+            // Convert <h3> back to ###
+            markdown = markdown.replace(/<h3>(.*?)<\/h3>/g, '### $1');
+            
+            // Convert note links back to markdown
+            markdown = markdown.replace(/<a href="#" class="note-link" data-note="([^"]+)">([^<]+)<\/a>/g, '[$2]($1)');
+            
+            // Convert <ul><li> back to markdown lists
+            markdown = markdown.replace(/<ul>\s*<li>(.*?)<\/li>\s*<\/ul>/g, '- $1');
+            
+            // Convert <p> tags
+            markdown = markdown.replace(/<p>(.*?)<\/p>/g, '$1\n\n');
+            
+            // Clean up extra whitespace
+            markdown = markdown.trim();
+            
+            return markdown;
+        }
+        
+        function editHomePage() {
+            console.log('Edit home page function called');
+            
+            // Set up the form to edit the home page
+            document.getElementById('title').value = 'Working Notes';
+            document.getElementById('content').value = `Welcome to my collection of interconnected working notes. This is a space for developing ideas in public, following Andy Matuschak's approach to [evergreen-notes].
+
+These notes are:
+
+- **Atomic:** Each note focuses on a single concept
+- **Concept-oriented:** Organized around ideas, not projects or sources  
+- **Densely linked:** Connections reveal patterns and insights
+- **Work in progress:** Always evolving as understanding deepens
+
+## Recent Notes
+
+[evergreen-notes] are written and organized to accumulate over time
+
+[spaced-repetition] can lower the stakes around destructive inbox-maintenance operations
+
+[knowledge-work] should accumulate insights over time
+
+[creative-work] benefits from maintaining a collection of interesting problems
+
+[deep-work] depends on both time and intensity
+
+## About This System
+
+This note-taking approach is inspired by [about-system] and the broader principles of [tools-for-thought].`;
+            
+            document.getElementById('linkedNotes').value = 'evergreen-notes, spaced-repetition, knowledge-work, creative-work, deep-work, about-system, tools-for-thought';
+            
+            // Change the form to home page editing mode
+            const form = document.getElementById('noteForm');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.textContent = 'Save Home Page';
+            submitBtn.onclick = saveHomePage;
+            
+            // Switch to add tab if not already there
+            switchTab('add');
+            
+            showMessage('Home page content loaded! Edit the content above and click "Save Home Page" to update the front page.', 'success');
+        }
+        
+        function saveHomePage(e) {
+            e.preventDefault();
+            
+            console.log('Save home page function called');
+            
+            const content = document.getElementById('content').value;
+            const htmlContent = convertMarkdownToHTML(content);
+            
+            console.log('Content to save:', content);
+            console.log('HTML content:', htmlContent);
+            
+            // Show loading message
+            showMessage('Saving home page...', 'success');
+            
+            // Update the home page content in index.html
+            updateHomePageInFile(htmlContent);
+            
+            // Reset the form
+            const form = document.getElementById('noteForm');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.textContent = 'Add Note';
+            submitBtn.onclick = null; // Reset to default form submission
+            
+            showMessage('Home page updated successfully! Refresh the main page to see changes.', 'success');
+        }
+        
+        async function updateHomePageInFile(htmlContent) {
+            try {
+                console.log('Starting to update home page file...');
+                
+                // First, get the current index.html content
+                const response = await fetch('index.html');
+                let htmlContent_full = await response.text();
+                
+                console.log('Fetched current index.html content');
+                
+                // Find the home panel content section
+                const homePanelStart = htmlContent_full.indexOf('<!-- Home Panel -->');
+                const noteBodyStart = htmlContent_full.indexOf('<div class="note-body">', homePanelStart);
+                const noteBodyEnd = htmlContent_full.indexOf('</div>', noteBodyStart + 1);
+                
+                console.log('Found positions:', { homePanelStart, noteBodyStart, noteBodyEnd });
+                
+                if (homePanelStart !== -1 && noteBodyStart !== -1 && noteBodyEnd !== -1) {
+                    // Replace the content between the note-body div
+                    const beforeContent = htmlContent_full.substring(0, noteBodyStart + 20); // +20 for the opening div tag
+                    const afterContent = htmlContent_full.substring(noteBodyEnd);
+                    
+                    const newHtmlContent = beforeContent + htmlContent + afterContent;
+                    
+                    console.log('Prepared new HTML content');
+                    
+                    // Save the updated content back to index.html
+                    const saveResult = await saveFileContent('index.html', newHtmlContent);
+                    console.log('Save result:', saveResult);
+                    
+                    showMessage('Home page saved successfully! ✅', 'success');
+                } else {
+                    console.error('Could not find home panel content');
+                    showMessage('Could not find home panel content in index.html', 'error');
+                }
+            } catch (error) {
+                console.error('Error updating home page:', error);
+                showMessage('Error updating home page: ' + error.message, 'error');
+            }
+        }
+        
+        async function saveFileContent(filename, content) {
+            try {
+                console.log('Attempting to save file:', filename);
+                
+                const response = await fetch('/save-file', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        filename: filename,
+                        content: content
+                    })
+                });
+                
+                console.log('Save response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Save failed:', errorText);
+                    throw new Error(`Failed to save file: ${response.status} ${errorText}`);
+                }
+                
+                const result = await response.json();
+                console.log('Save successful:', result);
+                return result;
+            } catch (error) {
+                console.error('Error saving file:', error);
+                // Fallback: show instructions for manual save
+                showMessage(`
+                    <strong>Manual Save Required</strong><br>
+                    Due to browser security restrictions, the file cannot be saved automatically.<br><br>
+                    <strong>To save your changes:</strong><br>
+                    1. Copy the HTML content below<br>
+                    2. Open index.html in your text editor<br>
+                    3. Replace the content between &lt;div class="note-body"&gt; and &lt;/div&gt;<br>
+                    4. Save the file<br><br>
+                    <textarea style="width: 100%; height: 200px; font-family: monospace; font-size: 12px;">${content}</textarea>
+                `, 'error');
+                throw error;
+            }
+        }
+        
+        // Load notes from index.html when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNotesFromFile();
+        });
+
+        async function testServer() {
+            try {
+                console.log('Testing server connection...');
+                showMessage('Testing server connection...', 'success');
+                
+                const response = await fetch('/save-file', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        filename: 'test.txt',
+                        content: 'test content'
+                    })
+                });
+                
+                console.log('Test response status:', response.status);
+                
+                if (response.status === 403) {
+                    showMessage('✅ Server is working! (403 expected for test.txt)', 'success');
+                } else if (response.ok) {
+                    showMessage('✅ Server is working!', 'success');
+                } else {
+                    showMessage(`❌ Server error: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                console.error('Server test failed:', error);
+                showMessage('❌ Server test failed: ' + error.message, 'error');
+            }
+        }
+        
+        async function testSaveHomePage() {
+            try {
+                console.log('Testing home page save...');
+                showMessage('Testing home page save...', 'success');
+                
+                const testContent = '<p>This is a test save of the home page content.</p>';
+                await updateHomePageInFile(testContent);
+                
+                showMessage('✅ Home page save test completed!', 'success');
+            } catch (error) {
+                console.error('Home page save test failed:', error);
+                showMessage('❌ Home page save test failed: ' + error.message, 'error');
+            }
+        }
+
+        function previewHomePage() {
+            // Load the current home page content and show preview
+            fetch('index.html')
+                .then(response => response.text())
+                .then(htmlContent => {
+                    // Extract the home page content
+                    const homePanelStart = htmlContent.indexOf('<!-- Home Panel -->');
+                    const noteBodyStart = htmlContent.indexOf('<div class="note-body">', homePanelStart);
+                    const noteBodyEnd = htmlContent.indexOf('</div>', noteBodyStart + 1);
+                    
+                    if (homePanelStart !== -1 && noteBodyStart !== -1 && noteBodyEnd !== -1) {
+                        const homeContent = htmlContent.substring(noteBodyStart + 20, noteBodyEnd);
+                        
+                        const previewContent = document.getElementById('previewContent');
+                        previewContent.innerHTML = `
+                            <h2>Working Notes (Home Page)</h2>
+                            <div>${homeContent}</div>
+                        `;
+                        
+                        document.getElementById('preview').style.display = 'block';
+                        showMessage('Home page preview loaded! 👁️', 'success');
+                    } else {
+                        showMessage('Could not find home page content', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading home page:', error);
+                    showMessage('Error loading home page: ' + error.message, 'error');
+                });
+        }
+    </script>
+</body>
+</html> 

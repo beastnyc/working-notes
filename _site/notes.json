@@ -1,0 +1,26 @@
+{
+  "notes": [
+    {
+      "id": "evergreen-notes",
+      "title": "Evergreen notes",
+      "lastModified": "2024-01-15T00:00:00.000Z",
+      "tags": [
+        "knowledge-work",
+        "note-taking",
+        "evergreen"
+      ],
+      "url": "/notes/evergreen-notes.html"
+    },
+    {
+      "id": "knowledge-work",
+      "title": "Knowledge work",
+      "lastModified": "2024-01-10T00:00:00.000Z",
+      "tags": [
+        "productivity",
+        "learning",
+        "evergreen"
+      ],
+      "url": "/notes/knowledge-work.html"
+    }
+  ]
+}

@@ -321,7 +321,7 @@ description: A beautiful, interconnected note-taking system inspired by Andy Mat
 <body>
     <div class="top-nav">
         <div class="nav-left">
-            <a href="/" class="home-link">← MULTIPOTENTIAL MIND</a>
+            <a href="/" class="home-link">← BIANCA'S WORKING NOTES</a>
         </div>
         <div class="nav-right">
             <div class="search-container">
@@ -333,9 +333,11 @@ description: A beautiful, interconnected note-taking system inspired by Andy Mat
     <div class="container" id="container">
         <div class="note-panel active">
             <div class="note-content">
-                <h1 class="note-title">Working Notes</h1>
+                <h1 class="note-title">Bianca's Digital Garden</h1>
                 <div class="note-body">
                     <p>Welcome to my digital garden of interconnected thoughts and ideas. This is where I explore concepts, build knowledge, and share insights that accumulate over time.</p>
+                    
+                    <p>Here you'll find my collection of evergreen notes - ideas that grow and evolve through connections and iterations. Each note represents a building block in my understanding of the world.</p>
                     
                     <h2>Recent Notes</h2>
                     <div class="notes-grid" id="notesGrid">

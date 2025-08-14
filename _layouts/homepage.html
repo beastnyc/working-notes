@@ -133,6 +133,8 @@
             height: calc(100vh - 65px);
             width: fit-content;
             min-width: 100vw;
+            overflow-x: auto;
+            overflow-y: hidden;
         }
 
         .note-panel {
@@ -145,11 +147,20 @@
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 0 0 20px var(--shadow-light);
             width: 600px;
+            transform: translateX(0);
+            opacity: 1;
         }
 
         .note-panel.hidden {
             transform: translateX(-100%);
             opacity: 0;
+            pointer-events: none;
+        }
+
+        .note-panel.active {
+            transform: translateX(0);
+            opacity: 1;
+            z-index: 10;
         }
 
         .note-content {
@@ -168,6 +179,26 @@
             text-transform: uppercase;
             letter-spacing: -0.5px;
             padding-right: 60px;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            z-index: 20;
+        }
+
+        .close-button:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
         }
 
         .note-title::after {
@@ -424,13 +455,17 @@
             const existingPanel = document.querySelector(`[data-note-id="${noteId}"]`);
             
             if (existingPanel) {
-                // If panel already exists, just show it
+                // If panel already exists, just show it and scroll to it
                 document.querySelectorAll('.note-panel').forEach(panel => {
                     panel.classList.remove('active');
-                    panel.classList.add('hidden');
                 });
-                existingPanel.classList.remove('hidden');
                 existingPanel.classList.add('active');
+                
+                // Scroll to the panel
+                container.scrollTo({
+                    left: existingPanel.offsetLeft,
+                    behavior: 'smooth'
+                });
                 return;
             }
 
@@ -441,18 +476,13 @@
                 return;
             }
 
-            // Hide all existing panels
-            document.querySelectorAll('.note-panel').forEach(panel => {
-                panel.classList.remove('active');
-                panel.classList.add('hidden');
-            });
-
             // Create new panel
             const newPanel = document.createElement('div');
             newPanel.className = 'note-panel active';
             newPanel.setAttribute('data-note-id', noteId);
             
             newPanel.innerHTML = `
+                <button class="close-button" onclick="closePanel('${noteId}')">×</button>
                 <div class="note-content">
                     <h1 class="note-title">${note.title}</h1>
                     <div class="note-body">
@@ -472,6 +502,14 @@
             `;
 
             container.appendChild(newPanel);
+
+            // Scroll to the new panel
+            setTimeout(() => {
+                container.scrollTo({
+                    left: newPanel.offsetLeft,
+                    behavior: 'smooth'
+                });
+            }, 100);
 
             // Convert wiki-links in the new panel
             const noteBody = newPanel.querySelector('.note-body');
@@ -527,6 +565,25 @@
                         </div>
                     `;
                 }).join('');
+            }
+        }
+
+        // Close panel function
+        function closePanel(noteId) {
+            const panel = document.querySelector(`[data-note-id="${noteId}"]`);
+            if (panel) {
+                panel.remove();
+                
+                // Scroll back to the last remaining panel
+                const remainingPanels = document.querySelectorAll('.note-panel');
+                if (remainingPanels.length > 0) {
+                    const lastPanel = remainingPanels[remainingPanels.length - 1];
+                    const container = document.getElementById('container');
+                    container.scrollTo({
+                        left: lastPanel.offsetLeft,
+                        behavior: 'smooth'
+                    });
+                }
             }
         }
 

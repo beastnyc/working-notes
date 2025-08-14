@@ -2,9 +2,12 @@
   "notes": [
     {
       "id": "index",
-      "title": "Untitled",
-      "lastModified": "",
-      "tags": [],
+      "title": "Bianca's Digital Garden",
+      "lastModified": "2024-01-15T00:00:00.000Z",
+      "tags": [
+        "homepage",
+        "digital-garden"
+      ],
       "url": "/notes/index.html"
     },
     {

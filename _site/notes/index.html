@@ -131,10 +131,9 @@
         .container {
             display: flex;
             height: calc(100vh - 65px);
-            width: fit-content;
-            min-width: 100vw;
-            overflow-x: auto;
-            overflow-y: hidden;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
         }
 
         .note-panel {
@@ -143,24 +142,33 @@
             border-right: 1px solid var(--border-color);
             flex-shrink: 0;
             overflow-y: auto;
-            position: relative;
+            position: absolute;
+            top: 0;
+            left: 0;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 0 0 20px var(--shadow-light);
             width: 600px;
             transform: translateX(0);
             opacity: 1;
+            z-index: 1;
         }
 
         .note-panel.hidden {
             transform: translateX(-100%);
             opacity: 0;
             pointer-events: none;
+            z-index: 0;
         }
 
         .note-panel.active {
             transform: translateX(0);
             opacity: 1;
             z-index: 10;
+        }
+
+        .note-panel.sliding-left {
+            transform: translateX(-100%);
+            z-index: 5;
         }
 
         .note-content {
@@ -477,17 +485,12 @@
             const existingPanel = document.querySelector(`[data-note-id="${noteId}"]`);
             
             if (existingPanel) {
-                // If panel already exists, just show it and scroll to it
+                // If panel already exists, just show it
                 document.querySelectorAll('.note-panel').forEach(panel => {
                     panel.classList.remove('active');
+                    panel.classList.remove('sliding-left');
                 });
                 existingPanel.classList.add('active');
-                
-                // Scroll to the panel
-                container.scrollTo({
-                    left: existingPanel.offsetLeft,
-                    behavior: 'smooth'
-                });
                 return;
             }
 
@@ -497,6 +500,12 @@
                 console.error('Note not found:', noteId);
                 return;
             }
+
+            // Slide existing panels to the left
+            document.querySelectorAll('.note-panel.active').forEach(panel => {
+                panel.classList.add('sliding-left');
+                panel.classList.remove('active');
+            });
 
             // Create new panel
             const newPanel = document.createElement('div');
@@ -524,14 +533,6 @@
             `;
 
             container.appendChild(newPanel);
-
-            // Scroll to the new panel
-            setTimeout(() => {
-                container.scrollTo({
-                    left: newPanel.offsetLeft,
-                    behavior: 'smooth'
-                });
-            }, 100);
 
             // Convert wiki-links in the new panel
             const noteBody = newPanel.querySelector('.note-body');
@@ -596,15 +597,12 @@
             if (panel) {
                 panel.remove();
                 
-                // Scroll back to the last remaining panel
+                // Show the last remaining panel
                 const remainingPanels = document.querySelectorAll('.note-panel');
                 if (remainingPanels.length > 0) {
                     const lastPanel = remainingPanels[remainingPanels.length - 1];
-                    const container = document.getElementById('container');
-                    container.scrollTo({
-                        left: lastPanel.offsetLeft,
-                        behavior: 'smooth'
-                    });
+                    lastPanel.classList.add('active');
+                    lastPanel.classList.remove('sliding-left');
                 }
             }
         }

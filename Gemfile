@@ -1,5 +1,8 @@
 source "https://rubygems.org"
 
+# Specify Bundler version compatible with Ruby 3.3
+ruby "3.3.0"
+
 gem "jekyll", "~> 4.3.0"
 gem "webrick", "~> 1.8"
 

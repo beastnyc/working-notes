@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bianca's Digital Garden - Working Notes</title>
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <title>Bianca's Digital Garden</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -148,6 +147,11 @@
             width: 600px;
         }
 
+        .note-panel.hidden {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
         .note-content {
             padding: 48px 60px 40px 40px;
             max-width: 100%;
@@ -185,6 +189,13 @@
             margin-bottom: 16px;
         }
 
+        .note-body h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            color: var(--text-primary);
+        }
+
         .note-body h2 {
             font-size: 20px;
             font-weight: 600;
@@ -220,40 +231,56 @@
             border-bottom-color: var(--accent-primary);
         }
 
-        .note-meta {
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 32px;
+        }
+
+        .note-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .note-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px var(--shadow-medium);
+            border-color: var(--accent-primary);
+        }
+
+        .note-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .note-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .note-card-meta {
             display: flex;
             align-items: center;
-            gap: 16px;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            gap: 12px;
             font-size: 12px;
             color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
-        .last-modified {
+        .loading {
             display: flex;
             align-items: center;
-            gap: 4px;
-        }
-
-        .intersection-tags {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .intersection-tag {
-            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
-            color: white;
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 9px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+            justify-content: center;
+            height: 200px;
+            color: var(--text-muted);
         }
 
         /* Mobile-first responsive design */
@@ -297,13 +324,18 @@
                 font-size: 24px;
                 padding-right: 50px;
             }
+
+            .notes-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="top-nav">
         <div class="nav-left">
-            <a href="/" class="home-link">← MULTIPOTENTIAL MIND</a>
+            <a href="/" class="home-link">← BIANCA'S WORKING NOTES</a>
         </div>
         <div class="nav-right">
             <div class="search-container">
@@ -313,7 +345,8 @@
         </div>
     </div>
     <div class="container" id="container">
-        <div class="note-panel active">
+        <!-- Home Panel -->
+        <div class="note-panel active" data-note-id="home">
             <div class="note-content">
                 <h1 class="note-title">Bianca's Digital Garden</h1>
                 <div class="note-body">
@@ -329,7 +362,7 @@
 </ul>
 <h2 id="recent-notes">Recent Notes</h2>
 <p>The notes below represent my current thinking and ongoing explorations. Each one is a work in progress, constantly evolving as I learn and connect new ideas.</p>
-<p>Check out my latest thinking on <a href="/notes/evergreen-notes" class="note-link">evergreen-notes</a> and <a href="/notes/knowledge-work" class="note-link">knowledge-work</a>.</p>
+<p>Check out my latest thinking on [[evergreen-notes]] and [[knowledge-work]].</p>
 <h2 id="about-this-space">About This Space</h2>
 <p>This digital garden follows the principles of evergreen note-taking, inspired by Andy Matuschak&#39;s approach. The goal isn&#39;t just to collect information, but to develop insights that compound over time.</p>
 <p>Every note here is designed to be:</p>
@@ -340,40 +373,230 @@
 <li><strong>Useful</strong>: Practical for future thinking and writing</li>
 </ul>
 
-                </div>
-                
-                <div class="note-meta">
-                    <div class="last-modified">
-                        <span>📅</span> Sun Jan 14 2024 19:00:00 GMT-0500 (Eastern Standard Time)
-                    </div>
                     
-                    <div class="intersection-tags">
-                        <span class="intersection-tag">homepage</span><span class="intersection-tag">digital-garden</span>
+                    <h2>Recent Notes</h2>
+                    <div class="notes-grid" id="notesGrid">
+                        <!-- Notes will be populated by JavaScript -->
                     </div>
-                    
                 </div>
-                
             </div>
         </div>
     </div>
 
     <script>
+        // Enhanced note data with timestamps and intersections
+        const notes = {
+            'evergreen-notes': {
+                title: 'Evergreen notes',
+                lastModified: '2024-01-15',
+                content: `
+                    <p>Evergreen notes are written and organized to accumulate over time. Unlike most notes apps, the goal here isn't to collect information: it's to develop insights.</p>
+                    
+                    <p>Most people take only transient notes. That is, they write temporary reminders and scratch thoughts that they'll use once then abandon. But [[knowledge-work]] can be much more effective when we accumulate insights over time.</p>
+
+                    <h2>Properties of evergreen notes</h2>
+                    <p>Effective evergreen notes share several properties:</p>
+                    <ul>
+                        <li><strong>Atomic:</strong> Each note should be about one thing. This makes them easier to link and helps avoid orphaned ideas.</li>
+                        <li><strong>Concept-oriented:</strong> Notes should be organized around concepts, not projects, people, or sources.</li>
+                        <li><strong>Densely linked:</strong> The real insight comes from the connections between ideas.</li>
+                        <li><strong>Own words:</strong> Writing in your own words forces you to really understand the concept.</li>
+                    </ul>
+
+                    <p>The term "evergreen" comes from the idea that these notes, like evergreen trees, remain useful and "alive" throughout the seasons.</p>
+
+                    <h2>See also</h2>
+                    <p>[[spaced-repetition]] systems use similar principles of iterative refinement.</p>
+                    <p>[[process-over-product]] mindset supports iterative note development.</p>
+                `,
+                linkedNotes: ['Spaced repetition', 'Knowledge work', 'Process over product']
+            },
+            'knowledge-work': {
+                title: 'Knowledge work',
+                lastModified: '2024-01-10',
+                content: `
+                    <p>Knowledge work should accumulate insights over time, but most knowledge workers don't have systems that support this accumulation.</p>
+
+                    <p>The typical pattern is to start fresh with each new project—reading papers, taking notes, then moving on without building lasting understanding. This is incredibly wasteful.</p>
+
+                    <h2>Building cumulative knowledge systems</h2>
+                    <p>Effective knowledge workers develop systems that help insights accumulate:</p>
+
+                    <ul>
+                        <li><strong>[[evergreen-notes]]:</strong> Persistent, developing insights</li>
+                        <li><strong>Regular review:</strong> [[spaced-repetition]] for ideas</li>
+                        <li><strong>Connection-making:</strong> Linking ideas across projects and domains</li>
+                        <li><strong>External thinking:</strong> Using writing to extend cognition</li>
+                    </ul>
+
+                    <p>The goal is to build a "knowledge asset" that grows more valuable over time, rather than starting from zero with each new project.</p>
+
+                    <h2>The compound interest of learning</h2>
+                    <p>Just as compound interest makes money grow exponentially, cumulative knowledge systems can make learning grow exponentially. Each new insight builds on previous insights, creating powerful feedback loops.</p>
+
+                    <p>This principle underlies why [[deep-work]] is so important for knowledge workers.</p>
+                `,
+                linkedNotes: ['Evergreen notes', 'Spaced repetition', 'Deep work', 'Creative work']
+            }
+        };
+
+        // Accordion functionality
+        function openNote(noteId) {
+            const container = document.getElementById('container');
+            const existingPanel = document.querySelector(`[data-note-id="${noteId}"]`);
+            
+            if (existingPanel) {
+                // If panel already exists, just show it
+                document.querySelectorAll('.note-panel').forEach(panel => {
+                    panel.classList.remove('active');
+                    panel.classList.add('hidden');
+                });
+                existingPanel.classList.remove('hidden');
+                existingPanel.classList.add('active');
+                return;
+            }
+
+            // Create new panel
+            const note = notes[noteId];
+            if (!note) {
+                console.error('Note not found:', noteId);
+                return;
+            }
+
+            // Hide all existing panels
+            document.querySelectorAll('.note-panel').forEach(panel => {
+                panel.classList.remove('active');
+                panel.classList.add('hidden');
+            });
+
+            // Create new panel
+            const newPanel = document.createElement('div');
+            newPanel.className = 'note-panel active';
+            newPanel.setAttribute('data-note-id', noteId);
+            
+            newPanel.innerHTML = `
+                <div class="note-content">
+                    <h1 class="note-title">${note.title}</h1>
+                    <div class="note-body">
+                        ${note.content}
+                    </div>
+                    <div class="note-meta">
+                        <div class="last-modified">
+                            <span>📅</span> ${note.lastModified}
+                        </div>
+                        ${note.linkedNotes ? `
+                        <div class="intersection-tags">
+                            ${note.linkedNotes.map(tag => `<span class="intersection-tag">${tag}</span>`).join('')}
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(newPanel);
+
+            // Convert wiki-links in the new panel
+            const noteBody = newPanel.querySelector('.note-body');
+            if (noteBody) {
+                noteBody.innerHTML = noteBody.innerHTML.replace(
+                    /\[\[([^\]]+)\]\]/g, 
+                    '<a href="#" class="note-link" data-note="$1">$1</a>'
+                );
+                
+                // Add click handlers to all note links
+                noteBody.querySelectorAll('.note-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const targetNote = this.getAttribute('data-note');
+                        if (targetNote) {
+                            openNote(targetNote);
+                        }
+                    });
+                });
+            }
+        }
+
+        // Fetch and display notes from the Jekyll site
+        async function loadNotes() {
+            try {
+                const response = await fetch('/notes.json');
+                const notesData = await response.json();
+                
+                const notesGrid = document.getElementById('notesGrid');
+                notesGrid.innerHTML = notesData.notes.map(note => `
+                    <div class="note-card" onclick="openNote('${note.id}')">
+                        <h3>${note.title}</h3>
+                        <p>${note.excerpt || 'Click to read more...'}</p>
+                        <div class="note-card-meta">
+                            <span>📅 ${note.lastModified}</span>
+                            ${note.tags ? `<span>🏷️ ${note.tags.join(', ')}</span>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.log('Notes will be loaded when Jekyll builds the site');
+                // Fallback to static notes
+                const notesGrid = document.getElementById('notesGrid');
+                notesGrid.innerHTML = Object.keys(notes).map(noteId => {
+                    const note = notes[noteId];
+                    return `
+                        <div class="note-card" onclick="openNote('${noteId}')">
+                            <h3>${note.title}</h3>
+                            <p>Click to read more...</p>
+                            <div class="note-card-meta">
+                                <span>📅 ${note.lastModified}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Convert Obsidian wiki-links to accordion links
+        function convertWikiLinks() {
+            const noteBody = document.querySelector('.note-body');
+            if (noteBody) {
+                // Convert [[note-name]] to accordion links
+                noteBody.innerHTML = noteBody.innerHTML.replace(
+                    /\[\[([^\]]+)\]\]/g, 
+                    '<a href="#" class="note-link" data-note="$1">$1</a>'
+                );
+                
+                // Add click handlers to all note links
+                noteBody.querySelectorAll('.note-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const targetNote = this.getAttribute('data-note');
+                        if (targetNote) {
+                            openNote(targetNote);
+                        }
+                    });
+                });
+            }
+        }
+
+        // Handle note links in the homepage content
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('note-link')) {
+                e.preventDefault();
+                const targetNote = e.target.getAttribute('data-note');
+                if (targetNote) {
+                    openNote(targetNote);
+                }
+            }
+        });
+
         // Simple search functionality
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const query = e.target.value.toLowerCase();
             console.log('Searching for:', query);
         });
 
-        // Handle note links
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('note-link')) {
-                e.preventDefault();
-                const href = e.target.getAttribute('href');
-                if (href && href.startsWith('/')) {
-                    window.location.href = href;
-                }
-            }
+        // Load notes when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNotes();
+            convertWikiLinks();
         });
     </script>
 </body>
-</html>
+</html> 

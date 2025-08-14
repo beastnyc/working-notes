@@ -58,12 +58,40 @@ function buildSite() {
       
       // Convert markdown to HTML
       let htmlContent = marked(body);
-      htmlContent = convertWikiLinks(htmlContent);
+      // Don't convert wiki-links for homepage - let JavaScript handle it
+      if (attributes.layout !== 'homepage') {
+        htmlContent = convertWikiLinks(htmlContent);
+      }
       
       // Create note ID from filename
       const noteId = file.replace('.md', '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
       
-      // Create note HTML
+      // Check if this is the homepage (has layout: homepage)
+      if (attributes.layout === 'homepage') {
+        // Use the homepage layout template
+        const homepageLayout = fs.readFileSync('_layouts/homepage.html', 'utf8');
+        const noteHtml = homepageLayout
+          .replace(/{{ page\.title }}/g, attributes.title || 'Working Notes')
+          .replace(/{{ content }}/g, htmlContent);
+        
+        // Write homepage HTML file
+        const noteFilePath = path.join(notesDir, `${noteId}.html`);
+        fs.writeFileSync(noteFilePath, noteHtml);
+        
+        // Add to notes array for index
+        notes.push({
+          id: noteId,
+          title: attributes.title || 'Working Notes',
+          lastModified: attributes.last_modified || '',
+          tags: attributes.tags || [],
+          url: `/notes/${noteId}.html`
+        });
+        
+        console.log(`📝 Built note: ${attributes.title || file}`);
+        return; // Skip the regular note processing
+      }
+      
+      // Create note HTML for regular notes
       const noteHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>

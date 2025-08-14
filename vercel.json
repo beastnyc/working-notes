@@ -1,8 +1,8 @@
 {
-  "buildCommand": "bundle exec jekyll build",
+  "buildCommand": "npm run build",
   "outputDirectory": "_site",
-  "installCommand": "bundle install",
-  "framework": "jekyll",
+  "installCommand": "npm install",
+  "framework": "node",
   "routes": [
     {
       "src": "/_notes/(.*)",
@@ -14,6 +14,6 @@
     }
   ],
   "env": {
-    "JEKYLL_ENV": "production"
+    "NODE_ENV": "production"
   }
 } 

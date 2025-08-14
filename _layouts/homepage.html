@@ -147,6 +147,11 @@
             width: 600px;
         }
 
+        .note-panel.hidden {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
         .note-content {
             padding: 48px 60px 40px 40px;
             max-width: 100%;
@@ -270,6 +275,14 @@
             color: var(--text-muted);
         }
 
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: var(--text-muted);
+        }
+
         /* Mobile-first responsive design */
         @media (max-width: 768px) {
             .top-nav {
@@ -332,7 +345,8 @@
         </div>
     </div>
     <div class="container" id="container">
-        <div class="note-panel active">
+        <!-- Home Panel -->
+        <div class="note-panel active" data-note-id="home">
             <div class="note-content">
                 <h1 class="note-title">{{ page.title }}</h1>
                 <div class="note-body">
@@ -348,27 +362,175 @@
     </div>
 
     <script>
+        // Enhanced note data with timestamps and intersections
+        const notes = {
+            'evergreen-notes': {
+                title: 'Evergreen notes',
+                lastModified: '2024-01-15',
+                content: `
+                    <p>Evergreen notes are written and organized to accumulate over time. Unlike most notes apps, the goal here isn't to collect information: it's to develop insights.</p>
+                    
+                    <p>Most people take only transient notes. That is, they write temporary reminders and scratch thoughts that they'll use once then abandon. But <a href="#" class="note-link" data-note="knowledge-work">knowledge work</a> can be much more effective when we accumulate insights over time.</p>
+
+                    <h2>Properties of evergreen notes</h2>
+                    <p>Effective evergreen notes share several properties:</p>
+                    <ul>
+                        <li><strong>Atomic:</strong> Each note should be about one thing. This makes them easier to link and helps avoid orphaned ideas.</li>
+                        <li><strong>Concept-oriented:</strong> Notes should be organized around concepts, not projects, people, or sources.</li>
+                        <li><strong>Densely linked:</strong> The real insight comes from the connections between ideas.</li>
+                        <li><strong>Own words:</strong> Writing in your own words forces you to really understand the concept.</li>
+                    </ul>
+
+                    <p>The term "evergreen" comes from the idea that these notes, like evergreen trees, remain useful and "alive" throughout the seasons.</p>
+
+                    <h2>See also</h2>
+                    <p><a href="#" class="note-link" data-note="spaced-repetition">Spaced repetition</a> systems use similar principles of iterative refinement.</p>
+                    <p><a href="#" class="note-link" data-note="process-over-product">Process over product</a> mindset supports iterative note development.</p>
+                `,
+                linkedNotes: ['Spaced repetition', 'Knowledge work', 'Process over product']
+            },
+            'knowledge-work': {
+                title: 'Knowledge work',
+                lastModified: '2024-01-10',
+                content: `
+                    <p>Knowledge work should accumulate insights over time, but most knowledge workers don't have systems that support this accumulation.</p>
+
+                    <p>The typical pattern is to start fresh with each new project—reading papers, taking notes, then moving on without building lasting understanding. This is incredibly wasteful.</p>
+
+                    <h2>Building cumulative knowledge systems</h2>
+                    <p>Effective knowledge workers develop systems that help insights accumulate:</p>
+
+                    <ul>
+                        <li><strong><a href="#" class="note-link" data-note="evergreen-notes">Evergreen notes</a>:</strong> Persistent, developing insights</li>
+                        <li><strong>Regular review:</strong> <a href="#" class="note-link" data-note="spaced-repetition">Spaced repetition</a> for ideas</li>
+                        <li><strong>Connection-making:</strong> Linking ideas across projects and domains</li>
+                        <li><strong>External thinking:</strong> Using writing to extend cognition</li>
+                    </ul>
+
+                    <p>The goal is to build a "knowledge asset" that grows more valuable over time, rather than starting from zero with each new project.</p>
+
+                    <h2>The compound interest of learning</h2>
+                    <p>Just as compound interest makes money grow exponentially, cumulative knowledge systems can make learning grow exponentially. Each new insight builds on previous insights, creating powerful feedback loops.</p>
+
+                    <p>This principle underlies why <a href="#" class="note-link" data-note="deep-work">effective deep work</a> is so important for knowledge workers.</p>
+                `,
+                linkedNotes: ['Evergreen notes', 'Spaced repetition', 'Deep work', 'Creative work']
+            }
+        };
+
+        // Accordion functionality
+        function openNote(noteId) {
+            const container = document.getElementById('container');
+            const existingPanel = document.querySelector(`[data-note-id="${noteId}"]`);
+            
+            if (existingPanel) {
+                // If panel already exists, just show it
+                document.querySelectorAll('.note-panel').forEach(panel => {
+                    panel.classList.remove('active');
+                    panel.classList.add('hidden');
+                });
+                existingPanel.classList.remove('hidden');
+                existingPanel.classList.add('active');
+                return;
+            }
+
+            // Create new panel
+            const note = notes[noteId];
+            if (!note) {
+                console.error('Note not found:', noteId);
+                return;
+            }
+
+            // Hide all existing panels
+            document.querySelectorAll('.note-panel').forEach(panel => {
+                panel.classList.remove('active');
+                panel.classList.add('hidden');
+            });
+
+            // Create new panel
+            const newPanel = document.createElement('div');
+            newPanel.className = 'note-panel active';
+            newPanel.setAttribute('data-note-id', noteId);
+            
+            newPanel.innerHTML = `
+                <div class="note-content">
+                    <h1 class="note-title">${note.title}</h1>
+                    <div class="note-body">
+                        ${note.content}
+                    </div>
+                    <div class="note-meta">
+                        <div class="last-modified">
+                            <span>📅</span> ${note.lastModified}
+                        </div>
+                        ${note.linkedNotes ? `
+                        <div class="intersection-tags">
+                            ${note.linkedNotes.map(tag => `<span class="intersection-tag">${tag}</span>`).join('')}
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(newPanel);
+
+            // Add click handlers to new note links
+            newPanel.querySelectorAll('.note-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetNote = this.getAttribute('data-note');
+                    if (targetNote) {
+                        openNote(targetNote);
+                    }
+                });
+            });
+        }
+
         // Fetch and display notes from the Jekyll site
         async function loadNotes() {
             try {
                 const response = await fetch('/notes.json');
-                const notes = await response.json();
+                const notesData = await response.json();
                 
                 const notesGrid = document.getElementById('notesGrid');
-                notesGrid.innerHTML = notes.map(note => `
-                    <div class="note-card" onclick="window.location.href='${note.url}'">
+                notesGrid.innerHTML = notesData.notes.map(note => `
+                    <div class="note-card" onclick="openNote('${note.id}')">
                         <h3>${note.title}</h3>
                         <p>${note.excerpt || 'Click to read more...'}</p>
                         <div class="note-card-meta">
-                            <span>📅 ${note.date}</span>
+                            <span>📅 ${note.lastModified}</span>
                             ${note.tags ? `<span>🏷️ ${note.tags.join(', ')}</span>` : ''}
                         </div>
                     </div>
                 `).join('');
             } catch (error) {
                 console.log('Notes will be loaded when Jekyll builds the site');
+                // Fallback to static notes
+                const notesGrid = document.getElementById('notesGrid');
+                notesGrid.innerHTML = Object.keys(notes).map(noteId => {
+                    const note = notes[noteId];
+                    return `
+                        <div class="note-card" onclick="openNote('${noteId}')">
+                            <h3>${note.title}</h3>
+                            <p>Click to read more...</p>
+                            <div class="note-card-meta">
+                                <span>📅 ${note.lastModified}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             }
         }
+
+        // Handle note links in the homepage content
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('note-link')) {
+                e.preventDefault();
+                const targetNote = e.target.getAttribute('data-note');
+                if (targetNote) {
+                    openNote(targetNote);
+                }
+            }
+        });
 
         // Simple search functionality
         document.getElementById('searchInput').addEventListener('input', function(e) {

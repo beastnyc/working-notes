@@ -3,11 +3,6 @@
   "outputDirectory": "_site",
   "installCommand": "bundle install",
   "framework": "jekyll",
-  "functions": {
-    "api/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "routes": [
     {
       "src": "/_notes/(.*)",

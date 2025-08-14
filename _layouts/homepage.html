@@ -370,7 +370,7 @@
                 content: `
                     <p>Evergreen notes are written and organized to accumulate over time. Unlike most notes apps, the goal here isn't to collect information: it's to develop insights.</p>
                     
-                    <p>Most people take only transient notes. That is, they write temporary reminders and scratch thoughts that they'll use once then abandon. But <a href="#" class="note-link" data-note="knowledge-work">knowledge work</a> can be much more effective when we accumulate insights over time.</p>
+                    <p>Most people take only transient notes. That is, they write temporary reminders and scratch thoughts that they'll use once then abandon. But [[knowledge-work]] can be much more effective when we accumulate insights over time.</p>
 
                     <h2>Properties of evergreen notes</h2>
                     <p>Effective evergreen notes share several properties:</p>
@@ -384,8 +384,8 @@
                     <p>The term "evergreen" comes from the idea that these notes, like evergreen trees, remain useful and "alive" throughout the seasons.</p>
 
                     <h2>See also</h2>
-                    <p><a href="#" class="note-link" data-note="spaced-repetition">Spaced repetition</a> systems use similar principles of iterative refinement.</p>
-                    <p><a href="#" class="note-link" data-note="process-over-product">Process over product</a> mindset supports iterative note development.</p>
+                    <p>[[spaced-repetition]] systems use similar principles of iterative refinement.</p>
+                    <p>[[process-over-product]] mindset supports iterative note development.</p>
                 `,
                 linkedNotes: ['Spaced repetition', 'Knowledge work', 'Process over product']
             },
@@ -401,8 +401,8 @@
                     <p>Effective knowledge workers develop systems that help insights accumulate:</p>
 
                     <ul>
-                        <li><strong><a href="#" class="note-link" data-note="evergreen-notes">Evergreen notes</a>:</strong> Persistent, developing insights</li>
-                        <li><strong>Regular review:</strong> <a href="#" class="note-link" data-note="spaced-repetition">Spaced repetition</a> for ideas</li>
+                        <li><strong>[[evergreen-notes]]:</strong> Persistent, developing insights</li>
+                        <li><strong>Regular review:</strong> [[spaced-repetition]] for ideas</li>
                         <li><strong>Connection-making:</strong> Linking ideas across projects and domains</li>
                         <li><strong>External thinking:</strong> Using writing to extend cognition</li>
                     </ul>
@@ -412,7 +412,7 @@
                     <h2>The compound interest of learning</h2>
                     <p>Just as compound interest makes money grow exponentially, cumulative knowledge systems can make learning grow exponentially. Each new insight builds on previous insights, creating powerful feedback loops.</p>
 
-                    <p>This principle underlies why <a href="#" class="note-link" data-note="deep-work">effective deep work</a> is so important for knowledge workers.</p>
+                    <p>This principle underlies why [[deep-work]] is so important for knowledge workers.</p>
                 `,
                 linkedNotes: ['Evergreen notes', 'Spaced repetition', 'Deep work', 'Creative work']
             }
@@ -473,16 +473,25 @@
 
             container.appendChild(newPanel);
 
-            // Add click handlers to new note links
-            newPanel.querySelectorAll('.note-link').forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const targetNote = this.getAttribute('data-note');
-                    if (targetNote) {
-                        openNote(targetNote);
-                    }
+            // Convert wiki-links in the new panel
+            const noteBody = newPanel.querySelector('.note-body');
+            if (noteBody) {
+                noteBody.innerHTML = noteBody.innerHTML.replace(
+                    /\[\[([^\]]+)\]\]/g, 
+                    '<a href="#" class="note-link" data-note="$1">$1</a>'
+                );
+                
+                // Add click handlers to all note links
+                noteBody.querySelectorAll('.note-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const targetNote = this.getAttribute('data-note');
+                        if (targetNote) {
+                            openNote(targetNote);
+                        }
+                    });
                 });
-            });
+            }
         }
 
         // Fetch and display notes from the Jekyll site
@@ -521,6 +530,29 @@
             }
         }
 
+        // Convert Obsidian wiki-links to accordion links
+        function convertWikiLinks() {
+            const noteBody = document.querySelector('.note-body');
+            if (noteBody) {
+                // Convert [[note-name]] to accordion links
+                noteBody.innerHTML = noteBody.innerHTML.replace(
+                    /\[\[([^\]]+)\]\]/g, 
+                    '<a href="#" class="note-link" data-note="$1">$1</a>'
+                );
+                
+                // Add click handlers to all note links
+                noteBody.querySelectorAll('.note-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const targetNote = this.getAttribute('data-note');
+                        if (targetNote) {
+                            openNote(targetNote);
+                        }
+                    });
+                });
+            }
+        }
+
         // Handle note links in the homepage content
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('note-link')) {
@@ -539,7 +571,10 @@
         });
 
         // Load notes when page loads
-        document.addEventListener('DOMContentLoaded', loadNotes);
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNotes();
+            convertWikiLinks();
+        });
     </script>
 </body>
 </html> 

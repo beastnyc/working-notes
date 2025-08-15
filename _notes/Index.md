@@ -1,12 +1,12 @@
 ---
 layout: homepage
-title: Bianca's Digital Garden
+title: Welcome to My Working Notes
 description: A collection of interconnected thoughts and ideas
-last_modified: 2024-01-15
-tags: [homepage, digital-garden]
+last_modified: 2025-08-15
+tags:
+  - homepage
+  - digital-garden
 ---
-
-# Welcome to My Digital Garden
 
 Welcome to my digital garden of interconnected thoughts and ideas. This is where I explore concepts, build knowledge, and share insights that accumulate over time.
 
@@ -14,12 +14,10 @@ Here you'll find my collection of evergreen notes - ideas that grow and evolve t
 
 ## What You'll Find Here
 
-- **Evergreen Notes**: Ideas that develop and mature over time
+- **[[Evergreen Notes]]**: Ideas that develop and mature over time
 - **Knowledge Connections**: Links between concepts across domains
 - **Personal Insights**: My evolving understanding of various topics
 - **Learning Journey**: The process of building cumulative knowledge
-
-
 
 ## About This Space
 

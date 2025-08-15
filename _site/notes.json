@@ -2,13 +2,31 @@
   "notes": [
     {
       "id": "index",
-      "title": "Bianca's Digital Garden",
-      "lastModified": "2024-01-15T00:00:00.000Z",
+      "title": "Welcome to My Working Notes",
+      "lastModified": "2025-08-15T00:00:00.000Z",
       "tags": [
         "homepage",
         "digital-garden"
       ],
       "url": "/notes/index.html"
+    },
+    {
+      "id": "knowledge-work",
+      "title": "Knowledge work",
+      "lastModified": "2025-08-15T00:00:00.000Z",
+      "tags": [
+        "productivity",
+        "learning",
+        "evergreen"
+      ],
+      "url": "/notes/knowledge-work.html"
+    },
+    {
+      "id": "multipotentiality",
+      "title": "Multipotentiality",
+      "lastModified": "2025-08-15T00:00:00.000Z",
+      "tags": [],
+      "url": "/notes/multipotentiality.html"
     },
     {
       "id": "evergreen-notes",
@@ -20,17 +38,6 @@
         "evergreen"
       ],
       "url": "/notes/evergreen-notes.html"
-    },
-    {
-      "id": "knowledge-work",
-      "title": "Knowledge work",
-      "lastModified": "2024-01-10T00:00:00.000Z",
-      "tags": [
-        "productivity",
-        "learning",
-        "evergreen"
-      ],
-      "url": "/notes/knowledge-work.html"
     }
   ]
 }

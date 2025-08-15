@@ -1,8 +1,8 @@
 ---
 layout: note
-title: Knowledge work
-last_modified: 2024-01-10
-tags: [productivity, learning, evergreen]
+title: Multipotentiality
+last_modified: 2025-08-15
+tags:
 ---
 
 Knowledge work should accumulate insights over time, but most knowledge workers don't have systems that support this accumulation.
@@ -13,7 +13,7 @@ The typical pattern is to start fresh with each new project—reading papers, ta
 
 Effective knowledge workers develop systems that help insights accumulate:
 
-- **[[evergreen-notes]]:** Persistent, developing insights
+- **[[Evergreen Notes]]:** Persistent, developing insights
 - **Regular review:** [[spaced-repetition]] for ideas
 - **Connection-making:** Linking ideas across projects and domains
 - **External thinking:** Using writing to extend cognition

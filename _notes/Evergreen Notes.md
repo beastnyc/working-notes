@@ -7,7 +7,7 @@ tags: [knowledge-work, note-taking, evergreen]
 
 Evergreen notes are written and organized to accumulate over time. Unlike most notes apps, the goal here isn't to collect information: it's to develop insights.
 
-Most people take only transient notes. That is, they write temporary reminders and scratch thoughts that they'll use once then abandon. But [[knowledge-work]] can be much more effective when we accumulate insights over time.
+Most people take only transient notes. That is, they write temporary reminders and scratch thoughts that they'll use once then abandon. But [[Knowledge Work]] can be much more effective when we accumulate insights over time.
 
 ## Properties of evergreen notes
 

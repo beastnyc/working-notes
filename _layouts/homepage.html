@@ -131,9 +131,11 @@
         .container {
             display: flex;
             height: calc(100vh - 65px);
-            width: 100vw;
-            overflow: hidden;
-            position: relative;
+            width: fit-content;
+            min-width: 100vw;
+            overflow-x: auto;
+            overflow-y: hidden;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
         .note-panel {
@@ -142,33 +144,38 @@
             border-right: 1px solid var(--border-color);
             flex-shrink: 0;
             overflow-y: auto;
-            position: absolute;
-            top: 0;
-            left: 0;
+            position: relative;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 0 0 20px var(--shadow-light);
             width: 600px;
-            transform: translateX(0);
-            opacity: 1;
-            z-index: 1;
         }
 
-        .note-panel.hidden {
-            transform: translateX(-100%);
-            opacity: 0;
-            pointer-events: none;
-            z-index: 0;
+        .note-panel.collapsed {
+            width: 200px;
+            overflow: hidden;
         }
 
-        .note-panel.active {
-            transform: translateX(0);
-            opacity: 1;
-            z-index: 10;
+        .note-panel.collapsed .note-content {
+            padding: 20px;
         }
 
-        .note-panel.sliding-left {
-            transform: translateX(-100%);
-            z-index: 5;
+        .note-panel.collapsed .note-body,
+        .note-panel.collapsed .note-meta,
+        .note-panel.collapsed .close-button {
+            display: none;
+        }
+
+        .note-panel.collapsed .note-title {
+            font-size: 16px;
+            margin-bottom: 0;
+            padding-right: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .note-panel.collapsed .note-title::after {
+            display: none;
         }
 
         .note-content {
@@ -463,12 +470,19 @@
             const existingPanel = document.querySelector(`[data-note-id="${noteId}"]`);
             
             if (existingPanel) {
-                // If panel already exists, just show it
+                // If panel already exists, just expand it
                 document.querySelectorAll('.note-panel').forEach(panel => {
                     panel.classList.remove('active');
-                    panel.classList.remove('sliding-left');
+                    panel.classList.add('collapsed');
                 });
+                existingPanel.classList.remove('collapsed');
                 existingPanel.classList.add('active');
+                
+                // Scroll to the panel
+                container.scrollTo({
+                    left: existingPanel.offsetLeft,
+                    behavior: 'smooth'
+                });
                 return;
             }
 
@@ -479,10 +493,10 @@
                 return;
             }
 
-            // Slide existing panels to the left
-            document.querySelectorAll('.note-panel.active').forEach(panel => {
-                panel.classList.add('sliding-left');
+            // Collapse existing panels to show just titles
+            document.querySelectorAll('.note-panel').forEach(panel => {
                 panel.classList.remove('active');
+                panel.classList.add('collapsed');
             });
 
             // Create new panel
@@ -511,6 +525,14 @@
             `;
 
             container.appendChild(newPanel);
+
+            // Scroll to the new panel
+            setTimeout(() => {
+                container.scrollTo({
+                    left: newPanel.offsetLeft,
+                    behavior: 'smooth'
+                });
+            }, 100);
 
             // Convert wiki-links in the new panel
             const noteBody = newPanel.querySelector('.note-body');
@@ -575,12 +597,19 @@
             if (panel) {
                 panel.remove();
                 
-                // Show the last remaining panel
+                // Expand the last remaining panel
                 const remainingPanels = document.querySelectorAll('.note-panel');
                 if (remainingPanels.length > 0) {
                     const lastPanel = remainingPanels[remainingPanels.length - 1];
+                    lastPanel.classList.remove('collapsed');
                     lastPanel.classList.add('active');
-                    lastPanel.classList.remove('sliding-left');
+                    
+                    // Scroll to the last panel
+                    const container = document.getElementById('container');
+                    container.scrollTo({
+                        left: lastPanel.offsetLeft,
+                        behavior: 'smooth'
+                    });
                 }
             }
         }

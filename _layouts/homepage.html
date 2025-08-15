@@ -131,7 +131,8 @@
         .container {
             display: flex;
             height: calc(100vh - 65px);
-            width: 100vw;
+            width: fit-content;
+            min-width: 100vw;
             overflow-x: auto;
             overflow-y: hidden;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
@@ -146,12 +147,10 @@
             position: relative;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 0 0 20px var(--shadow-light);
-            flex: 1;
-            min-width: 0;
+            width: 700px;
         }
 
         .note-panel.collapsed {
-            flex: none;
             width: 60px;
             overflow: hidden;
         }

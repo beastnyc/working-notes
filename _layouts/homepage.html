@@ -660,7 +660,9 @@
                         e.preventDefault();
                         const targetNote = this.getAttribute('data-note');
                         if (targetNote) {
-                            openNote(targetNote);
+                            // Convert the wiki-link text to the note ID format
+                            const noteId = targetNote.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                            openNote(noteId);
                         }
                     });
                 });
@@ -722,7 +724,9 @@
                         e.preventDefault();
                         const targetNote = this.getAttribute('data-note');
                         if (targetNote) {
-                            openNote(targetNote);
+                            // Convert the wiki-link text to the note ID format
+                            const noteId = targetNote.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                            openNote(noteId);
                         }
                     });
                 });

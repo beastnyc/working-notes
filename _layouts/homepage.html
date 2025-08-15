@@ -131,8 +131,7 @@
         .container {
             display: flex;
             height: calc(100vh - 65px);
-            width: fit-content;
-            min-width: 100vw;
+            width: 100vw;
             overflow-x: auto;
             overflow-y: hidden;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
@@ -147,10 +146,12 @@
             position: relative;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 0 0 20px var(--shadow-light);
-            width: 600px;
+            flex: 1;
+            min-width: 0;
         }
 
         .note-panel.collapsed {
+            flex: none;
             width: 60px;
             overflow: hidden;
         }
@@ -496,9 +497,10 @@
                     existingPanel.classList.remove('collapsed');
                     existingPanel.classList.add('active');
                 } else {
-                    // If 3 or fewer panels, just make this one active
+                    // If 3 or fewer panels, ensure all are expanded
                     allPanels.forEach(panel => {
                         panel.classList.remove('active');
+                        panel.classList.remove('collapsed');
                     });
                     existingPanel.classList.add('active');
                 }
@@ -529,9 +531,10 @@
                     panel.classList.add('collapsed');
                 });
             } else {
-                // If we'll have 3 or fewer panels, just remove active class
+                // If we'll have 3 or fewer panels, ensure all are expanded
                 currentPanels.forEach(panel => {
                     panel.classList.remove('active');
+                    panel.classList.remove('collapsed');
                 });
             }
 

@@ -19,11 +19,7 @@ Here you'll find my collection of evergreen notes - ideas that grow and evolve t
 - **Personal Insights**: My evolving understanding of various topics
 - **Learning Journey**: The process of building cumulative knowledge
 
-## Recent Notes
 
-The notes below represent my current thinking and ongoing explorations. Each one is a work in progress, constantly evolving as I learn and connect new ideas.
-
-Check out my latest thinking on [[evergreen-notes]] and [[knowledge-work]].
 
 ## About This Space
 

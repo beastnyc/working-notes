@@ -280,6 +280,20 @@
             margin-bottom: 8px;
         }
 
+        .note-meta {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .last-modified {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .note-link {
             color: var(--accent-primary);
             text-decoration: none;
@@ -421,9 +435,6 @@
 <li><strong>Personal Insights</strong>: My evolving understanding of various topics</li>
 <li><strong>Learning Journey</strong>: The process of building cumulative knowledge</li>
 </ul>
-<h2 id="recent-notes">Recent Notes</h2>
-<p>The notes below represent my current thinking and ongoing explorations. Each one is a work in progress, constantly evolving as I learn and connect new ideas.</p>
-<p>Check out my latest thinking on [[evergreen-notes]] and [[knowledge-work]].</p>
 <h2 id="about-this-space">About This Space</h2>
 <p>This digital garden follows the principles of evergreen note-taking, inspired by Andy Matuschak&#39;s approach. The goal isn&#39;t just to collect information, but to develop insights that compound over time.</p>
 <p>Every note here is designed to be:</p>
@@ -434,10 +445,10 @@
 <li><strong>Useful</strong>: Practical for future thinking and writing</li>
 </ul>
 
-                    
-                    <h2>Recent Notes</h2>
-                    <div class="notes-grid" id="notesGrid">
-                        <!-- Notes will be populated by JavaScript -->
+                </div>
+                <div class="note-meta">
+                    <div class="last-modified">
+                        <span>📅</span> Last updated {{ page.last_modified }}
                     </div>
                 </div>
             </div>
@@ -575,13 +586,8 @@
                     </div>
                     <div class="note-meta">
                         <div class="last-modified">
-                            <span>📅</span> ${note.lastModified}
+                            <span>📅</span> Last updated ${note.lastModified}
                         </div>
-                        ${note.linkedNotes ? `
-                        <div class="intersection-tags">
-                            ${note.linkedNotes.map(tag => `<span class="intersection-tag">${tag}</span>`).join('')}
-                        </div>
-                        ` : ''}
                     </div>
                 </div>
             `;
@@ -617,41 +623,7 @@
             }
         }
 
-        // Fetch and display notes from the Jekyll site
-        async function loadNotes() {
-            try {
-                const response = await fetch('/notes.json');
-                const notesData = await response.json();
-                
-                const notesGrid = document.getElementById('notesGrid');
-                notesGrid.innerHTML = notesData.notes.map(note => `
-                    <div class="note-card" onclick="openNote('${note.id}')">
-                        <h3>${note.title}</h3>
-                        <p>${note.excerpt || 'Click to read more...'}</p>
-                        <div class="note-card-meta">
-                            <span>📅 ${note.lastModified}</span>
-                            ${note.tags ? `<span>🏷️ ${note.tags.join(', ')}</span>` : ''}
-                        </div>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.log('Notes will be loaded when Jekyll builds the site');
-                // Fallback to static notes
-                const notesGrid = document.getElementById('notesGrid');
-                notesGrid.innerHTML = Object.keys(notes).map(noteId => {
-                    const note = notes[noteId];
-                    return `
-                        <div class="note-card" onclick="openNote('${noteId}')">
-                            <h3>${note.title}</h3>
-                            <p>Click to read more...</p>
-                            <div class="note-card-meta">
-                                <span>📅 ${note.lastModified}</span>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            }
-        }
+
 
         // Close panel function
         function closePanel(noteId) {
@@ -732,7 +704,6 @@
 
         // Load notes when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            loadNotes();
             convertWikiLinks();
         });
     </script>

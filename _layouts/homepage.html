@@ -105,6 +105,69 @@
             box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.1);
         }
 
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px var(--shadow-medium);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .search-result-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .search-result-item.no-results {
+            color: var(--text-muted);
+            cursor: default;
+        }
+
+        .search-result-item.no-results:hover {
+            background: none;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .result-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .match-type {
+            background: var(--accent-primary);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
         .search-icon {
             position: absolute;
             left: 14px;
@@ -677,14 +740,127 @@
             }
         });
 
-        // Simple search functionality
+        // Search functionality
+        let searchResults = [];
+        let allNotes = {};
+
+        // Combine static notes with dynamic notes from notes.json
+        async function loadAllNotes() {
+            try {
+                const response = await fetch('/notes.json');
+                const notesData = await response.json();
+                
+                // Add dynamic notes to allNotes
+                notesData.notes.forEach(note => {
+                    allNotes[note.id] = {
+                        title: note.title,
+                        content: note.excerpt || '',
+                        lastModified: note.lastModified,
+                        url: note.url
+                    };
+                });
+            } catch (error) {
+                console.log('Could not load notes.json, using static notes only');
+            }
+            
+            // Add static notes
+            Object.keys(notes).forEach(noteId => {
+                allNotes[noteId] = {
+                    title: notes[noteId].title,
+                    content: notes[noteId].content,
+                    lastModified: notes[noteId].lastModified
+                };
+            });
+        }
+
+        // Search through notes
+        function searchNotes(query) {
+            if (!query.trim()) {
+                hideSearchResults();
+                return;
+            }
+
+            const results = [];
+            const searchTerm = query.toLowerCase();
+
+            Object.keys(allNotes).forEach(noteId => {
+                const note = allNotes[noteId];
+                const titleMatch = note.title.toLowerCase().includes(searchTerm);
+                const contentMatch = note.content.toLowerCase().includes(searchTerm);
+                
+                if (titleMatch || contentMatch) {
+                    results.push({
+                        id: noteId,
+                        title: note.title,
+                        lastModified: note.lastModified,
+                        url: note.url,
+                        matchType: titleMatch ? 'title' : 'content'
+                    });
+                }
+            });
+
+            displaySearchResults(results);
+        }
+
+        // Display search results
+        function displaySearchResults(results) {
+            const searchContainer = document.querySelector('.search-container');
+            let resultsDropdown = document.querySelector('.search-results');
+            
+            if (!resultsDropdown) {
+                resultsDropdown = document.createElement('div');
+                resultsDropdown.className = 'search-results';
+                searchContainer.appendChild(resultsDropdown);
+            }
+
+            if (results.length === 0) {
+                resultsDropdown.innerHTML = '<div class="search-result-item no-results">No notes found</div>';
+            } else {
+                resultsDropdown.innerHTML = results.map(result => `
+                    <div class="search-result-item" onclick="openNoteFromSearch('${result.id}')">
+                        <div class="result-title">${result.title}</div>
+                        <div class="result-meta">
+                            <span class="match-type">${result.matchType}</span>
+                            <span class="last-modified">📅 ${result.lastModified}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            resultsDropdown.style.display = 'block';
+        }
+
+        // Hide search results
+        function hideSearchResults() {
+            const resultsDropdown = document.querySelector('.search-results');
+            if (resultsDropdown) {
+                resultsDropdown.style.display = 'none';
+            }
+        }
+
+        // Open note from search results
+        function openNoteFromSearch(noteId) {
+            openNote(noteId);
+            hideSearchResults();
+            document.getElementById('searchInput').value = '';
+        }
+
+        // Search input event listener
         document.getElementById('searchInput').addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase();
-            console.log('Searching for:', query);
+            const query = e.target.value;
+            searchNotes(query);
+        });
+
+        // Hide search results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-container')) {
+                hideSearchResults();
+            }
         });
 
         // Load notes when page loads
         document.addEventListener('DOMContentLoaded', function() {
+            loadAllNotes();
             convertWikiLinks();
         });
     </script>

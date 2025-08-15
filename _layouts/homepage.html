@@ -147,7 +147,9 @@
             position: relative;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 0 0 20px var(--shadow-light);
-            width: 700px;
+            width: calc(100vw / 3);
+            min-width: 400px;
+            max-width: 700px;
         }
 
         .note-panel.collapsed {

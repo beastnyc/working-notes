@@ -151,12 +151,16 @@
         }
 
         .note-panel.collapsed {
-            width: 200px;
+            width: 60px;
             overflow: hidden;
         }
 
         .note-panel.collapsed .note-content {
-            padding: 20px;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .note-panel.collapsed .note-body,
@@ -166,12 +170,21 @@
         }
 
         .note-panel.collapsed .note-title {
-            font-size: 16px;
-            margin-bottom: 0;
-            padding-right: 0;
+            font-size: 14px;
+            margin: 0;
+            padding: 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            width: 200px;
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -100px;
+            margin-top: -10px;
         }
 
         .note-panel.collapsed .note-title::after {
@@ -493,12 +506,24 @@
             
             if (existingPanel) {
                 // If panel already exists, just expand it
-                document.querySelectorAll('.note-panel').forEach(panel => {
-                    panel.classList.remove('active');
-                    panel.classList.add('collapsed');
-                });
-                existingPanel.classList.remove('collapsed');
-                existingPanel.classList.add('active');
+                const allPanels = document.querySelectorAll('.note-panel');
+                const panelCount = allPanels.length;
+                
+                if (panelCount > 3) {
+                    // If more than 3 panels, collapse all except the current one
+                    allPanels.forEach(panel => {
+                        panel.classList.remove('active');
+                        panel.classList.add('collapsed');
+                    });
+                    existingPanel.classList.remove('collapsed');
+                    existingPanel.classList.add('active');
+                } else {
+                    // If 3 or fewer panels, just make this one active
+                    allPanels.forEach(panel => {
+                        panel.classList.remove('active');
+                    });
+                    existingPanel.classList.add('active');
+                }
                 
                 // Scroll to the panel
                 container.scrollTo({
@@ -515,11 +540,22 @@
                 return;
             }
 
-            // Collapse existing panels to show just titles
-            document.querySelectorAll('.note-panel').forEach(panel => {
-                panel.classList.remove('active');
-                panel.classList.add('collapsed');
-            });
+            // Check how many panels we'll have after adding this one
+            const currentPanels = document.querySelectorAll('.note-panel');
+            const newPanelCount = currentPanels.length + 1;
+            
+            if (newPanelCount > 3) {
+                // If we'll have more than 3 panels, collapse all existing ones
+                currentPanels.forEach(panel => {
+                    panel.classList.remove('active');
+                    panel.classList.add('collapsed');
+                });
+            } else {
+                // If we'll have 3 or fewer panels, just remove active class
+                currentPanels.forEach(panel => {
+                    panel.classList.remove('active');
+                });
+            }
 
             // Create new panel
             const newPanel = document.createElement('div');
@@ -619,15 +655,29 @@
             if (panel) {
                 panel.remove();
                 
-                // Expand the last remaining panel
+                // Handle remaining panels based on count
                 const remainingPanels = document.querySelectorAll('.note-panel');
                 if (remainingPanels.length > 0) {
-                    const lastPanel = remainingPanels[remainingPanels.length - 1];
-                    lastPanel.classList.remove('collapsed');
-                    lastPanel.classList.add('active');
+                    if (remainingPanels.length <= 3) {
+                        // If 3 or fewer panels, expand all
+                        remainingPanels.forEach(panel => {
+                            panel.classList.remove('collapsed');
+                            panel.classList.add('active');
+                        });
+                    } else {
+                        // If more than 3 panels, keep accordion behavior
+                        const lastPanel = remainingPanels[remainingPanels.length - 1];
+                        remainingPanels.forEach(panel => {
+                            panel.classList.remove('active');
+                            panel.classList.add('collapsed');
+                        });
+                        lastPanel.classList.remove('collapsed');
+                        lastPanel.classList.add('active');
+                    }
                     
                     // Scroll to the last panel
                     const container = document.getElementById('container');
+                    const lastPanel = remainingPanels[remainingPanels.length - 1];
                     container.scrollTo({
                         left: lastPanel.offsetLeft,
                         behavior: 'smooth'

@@ -1,6 +1,6 @@
 {
   "buildCommand": "./build.sh",
-  "outputDirectory": "_notes/_site",
+  "outputDirectory": "_site",
   "installCommand": "cd _notes && npm install",
   "rewrites": [
     {

@@ -25,7 +25,7 @@ function buildSite() {
   console.log('🔨 Building Working Notes site...');
   
   // Create output directories
-  const outputDir = '_site';
+  const outputDir = '../_site';
   const notesDir = path.join(outputDir, 'notes');
   
   if (!fs.existsSync(outputDir)) {
@@ -71,8 +71,20 @@ function buildSite() {
       if (attributes.layout === 'homepage') {
         // Use the homepage layout template
         const homepageLayout = fs.readFileSync('_layouts/homepage.html', 'utf8');
+        
+        // Format the last_modified date properly if it's a Date object
+        let lastModifiedFormatted = '';
+        if (attributes.last_modified) {
+          if (attributes.last_modified instanceof Date) {
+            lastModifiedFormatted = attributes.last_modified.toISOString().split('T')[0]; // Convert to YYYY-MM-DD format
+          } else {
+            lastModifiedFormatted = attributes.last_modified.toString();
+          }
+        }
+        
         const noteHtml = homepageLayout
           .replace(/{{ page\.title }}/g, attributes.title || 'Working Notes')
+          .replace(/{{ page\.last_modified }}/g, lastModifiedFormatted)
           .replace(/{{ content }}/g, htmlContent);
         
         // Write homepage HTML file
@@ -83,7 +95,7 @@ function buildSite() {
         notes.push({
           id: noteId,
           title: attributes.title || 'Working Notes',
-          lastModified: attributes.last_modified || '',
+          lastModified: lastModifiedFormatted,
           tags: attributes.tags || [],
           url: `/notes/${noteId}.html`
         });
@@ -417,7 +429,7 @@ function buildSite() {
                 ${attributes.last_modified ? `
                 <div class="note-meta">
                     <div class="last-modified">
-                        <span>📅</span> ${attributes.last_modified}
+                        <span>📅</span> ${attributes.last_modified instanceof Date ? attributes.last_modified.toISOString().split('T')[0] : attributes.last_modified}
                     </div>
                     ${attributes.tags ? `
                     <div class="intersection-tags">
@@ -459,7 +471,7 @@ function buildSite() {
       notes.push({
         id: noteId,
         title: attributes.title || 'Untitled',
-        lastModified: attributes.last_modified || '',
+        lastModified: attributes.last_modified instanceof Date ? attributes.last_modified.toISOString().split('T')[0] : (attributes.last_modified || ''),
         tags: attributes.tags || [],
         url: `/notes/${noteId}.html`
       });
@@ -470,7 +482,12 @@ function buildSite() {
   
   // Create notes index JSON
   const notesIndex = {
-    notes: notes.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified))
+    notes: notes.sort((a, b) => {
+      // Sort by lastModified date, but keep the original string format
+      const dateA = new Date(a.lastModified);
+      const dateB = new Date(b.lastModified);
+      return dateB - dateA; // Most recent first
+    })
   };
   
   fs.writeFileSync(path.join(outputDir, 'notes.json'), JSON.stringify(notesIndex, null, 2));

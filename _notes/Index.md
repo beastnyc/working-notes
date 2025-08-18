@@ -2,7 +2,7 @@
 layout: homepage
 title: Welcome to My Working Notes
 description: A collection of interconnected thoughts and ideas
-last_modified: 2025-08-17
+last_modified: 2025-01-27
 tags:
   - homepage
   - digital-garden
@@ -10,7 +10,7 @@ tags:
 
 Welcome to my digital garden of interconnected thoughts and ideas. This is where I explore concepts, build knowledge, and share insights that accumulate over time.
 
-Here you'll find my collection of evergreen notes - ideas that grow and evolve through connections and iterations. Each note represents a building block in my understanding of the world. Check out my work on [[Multipotentiality]] too
+[[Here]] you'll find my collection of evergreen notes - ideas that grow and evolve through connections and iterations. Each note represents a building block in my understanding of the world. Check out my work on [[Multipotentiality]] too
 
 ## What You'll Find Here
 

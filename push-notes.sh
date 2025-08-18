@@ -8,7 +8,7 @@ echo "🔄 Starting note sync and deployment..."
 # Change to the Working Notes directory
 cd "/Users/bianca/Working Notes"
 
-# Run the sync script
-node _notes/sync-from-obsidian.js
+# Run the sync script with full path to Node.js
+/usr/local/bin/node _notes/sync-from-obsidian.js
 
 echo "✅ Sync and deployment complete!"

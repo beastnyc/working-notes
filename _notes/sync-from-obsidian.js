@@ -7,7 +7,7 @@ const { execSync } = require('child_process');
 // Configuration - UPDATE THESE PATHS
 const OBSIDIAN_VAULT_PATH = '/Users/bianca/Documents/mind/_notes'; // UPDATED
 const WORKING_NOTES_PATH = path.join(__dirname, '_notes');
-const GITHUB_REPO_PATH = __dirname;
+const GITHUB_REPO_PATH = path.join(__dirname, '..'); // Go up one level to the root
 
 console.log('🔄 Syncing notes from Obsidian vault...');
 
@@ -32,11 +32,12 @@ function copyDirectory(source, destination) {
     });
 }
 
-// Function to build the site
+// Function to build the site using the new build.sh script
 function buildSite() {
     console.log('🔨 Building site...');
     try {
-        execSync('/usr/local/bin/npm run build', { cwd: GITHUB_REPO_PATH, stdio: 'inherit' });
+        // Use the new build.sh script from the root directory
+        execSync('./build.sh', { cwd: GITHUB_REPO_PATH, stdio: 'inherit' });
         console.log('✅ Site built successfully');
     } catch (error) {
         console.error('❌ Error building site:', error.message);

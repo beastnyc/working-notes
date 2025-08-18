@@ -1,103 +1,9 @@
-#!/usr/bin/env node
-
-const fs = require('fs');
-const path = require('path');
-const { marked } = require('marked');
-const frontMatter = require('front-matter');
-
-// Configure marked for better rendering
-marked.setOptions({
-  gfm: true,
-  breaks: true,
-  headerIds: true
-});
-
-// Convert Obsidian wiki-links to HTML links
-function convertWikiLinks(text) {
-  return text.replace(/\[\[([^\]]+)\]\]/g, (match, linkText) => {
-    const noteId = linkText.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    return `<a href="/notes/${noteId}" class="note-link">${linkText}</a>`;
-  });
-}
-
-// Build the site
-function buildSite() {
-  console.log('🔨 Building Working Notes site...');
-  
-  // Create output directories
-  const outputDir = '_site';
-  const notesDir = path.join(outputDir, 'notes');
-  
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir);
-  }
-  if (!fs.existsSync(notesDir)) {
-    fs.mkdirSync(notesDir);
-  }
-  
-  // Copy static files
-  const staticFiles = ['index.html', 'admin.html', 'serve.py'];
-  staticFiles.forEach(file => {
-    if (fs.existsSync(file)) {
-      fs.copyFileSync(file, path.join(outputDir, file));
-      console.log(`📄 Copied ${file}`);
-    }
-  });
-  
-  // Process notes
-  const notesDirPath = '_notes';
-  const notes = [];
-  
-  if (fs.existsSync(notesDirPath)) {
-    const noteFiles = fs.readdirSync(notesDirPath).filter(file => file.endsWith('.md'));
-    
-    noteFiles.forEach(file => {
-      const filePath = path.join(notesDirPath, file);
-      const content = fs.readFileSync(filePath, 'utf8');
-      const { attributes, body } = frontMatter(content);
-      
-      // Convert markdown to HTML
-      let htmlContent = marked(body);
-      // Don't convert wiki-links for homepage - let JavaScript handle it
-      if (attributes.layout !== 'homepage') {
-        htmlContent = convertWikiLinks(htmlContent);
-      }
-      
-      // Create note ID from filename
-      const noteId = file.replace('.md', '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      
-      // Check if this is the homepage (has layout: homepage)
-      if (attributes.layout === 'homepage') {
-        // Use the homepage layout template
-        const homepageLayout = fs.readFileSync('_layouts/homepage.html', 'utf8');
-        const noteHtml = homepageLayout
-          .replace(/{{ page\.title }}/g, attributes.title || 'Working Notes')
-          .replace(/{{ content }}/g, htmlContent);
-        
-        // Write homepage HTML file
-        const noteFilePath = path.join(notesDir, `${noteId}.html`);
-        fs.writeFileSync(noteFilePath, noteHtml);
-        
-        // Add to notes array for index
-        notes.push({
-          id: noteId,
-          title: attributes.title || 'Working Notes',
-          lastModified: attributes.last_modified || '',
-          tags: attributes.tags || [],
-          url: `/notes/${noteId}.html`
-        });
-        
-        console.log(`📝 Built note: ${attributes.title || file}`);
-        return; // Skip the regular note processing
-      }
-      
-      // Create note HTML for regular notes
-      const noteHtml = `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${attributes.title || 'Note'} - Working Notes</title>
+    <title>Evergreen notes - Working Notes</title>
     <link rel="stylesheet" href="/assets/css/style.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -409,22 +315,35 @@ function buildSite() {
     <div class="container" id="container">
         <div class="note-panel active">
             <div class="note-content">
-                <h1 class="note-title">${attributes.title || 'Note'}</h1>
+                <h1 class="note-title">Evergreen notes</h1>
                 <div class="note-body">
-                    ${htmlContent}
+                    <p>Evergreen notes are written and organized to accumulate over time. Unlike most notes apps, the goal here isn&#39;t to collect information: it&#39;s to develop insights.</p>
+<p>Most people take only transient notes. That is, they write temporary reminders and scratch thoughts that they&#39;ll use once then abandon. But <a href="/notes/knowledge-work" class="note-link">Knowledge Work</a> can be much more effective when we accumulate insights over time.</p>
+<h2 id="properties-of-evergreen-notes">Properties of evergreen notes</h2>
+<p>Effective evergreen notes share several properties:</p>
+<ul>
+<li><strong>Atomic:</strong> Each note should be about one thing. This makes them easier to link and helps avoid orphaned ideas.</li>
+<li><strong>Concept-oriented:</strong> Notes should be organized around concepts, not projects, people, or sources.</li>
+<li><strong>Densely linked:</strong> The real insight comes from the connections between ideas.</li>
+<li><strong>Own words:</strong> Writing in your own words forces you to really understand the concept.</li>
+</ul>
+<p>The term &quot;evergreen&quot; comes from the idea that these notes, like evergreen trees, remain useful and &quot;alive&quot; throughout the seasons.</p>
+<h2 id="see-also">See also</h2>
+<p><a href="/notes/spaced-repetition" class="note-link">spaced-repetition</a> systems use similar principles of iterative refinement.<br><a href="/notes/process-over-product" class="note-link">process-over-product</a> mindset supports iterative note development. </p>
+
                 </div>
-                ${attributes.last_modified ? `
+                
                 <div class="note-meta">
                     <div class="last-modified">
-                        <span>📅</span> ${attributes.last_modified}
+                        <span>📅</span> Sun Jan 14 2024 19:00:00 GMT-0500 (Eastern Standard Time)
                     </div>
-                    ${attributes.tags ? `
+                    
                     <div class="intersection-tags">
-                        ${attributes.tags.map(tag => `<span class="intersection-tag">${tag}</span>`).join('')}
+                        <span class="intersection-tag">knowledge-work</span><span class="intersection-tag">note-taking</span><span class="intersection-tag">evergreen</span>
                     </div>
-                    ` : ''}
+                    
                 </div>
-                ` : ''}
+                
             </div>
         </div>
     </div>
@@ -448,36 +367,4 @@ function buildSite() {
         });
     </script>
 </body>
-</html>`;
-      
-      // Write note HTML file
-      const noteFilePath = path.join(notesDir, `${noteId}.html`);
-      fs.writeFileSync(noteFilePath, noteHtml);
-      
-      // Add to notes array for index
-      notes.push({
-        id: noteId,
-        title: attributes.title || 'Untitled',
-        lastModified: attributes.last_modified || '',
-        tags: attributes.tags || [],
-        url: `/notes/${noteId}.html`
-      });
-      
-      console.log(`📝 Built note: ${attributes.title || file}`);
-    });
-  }
-  
-  // Create notes index JSON
-  const notesIndex = {
-    notes: notes.sort((a, b) => new Date(b.lastModified) - new Date(a.lastModified))
-  };
-  
-  fs.writeFileSync(path.join(outputDir, 'notes.json'), JSON.stringify(notesIndex, null, 2));
-  
-  console.log(`✅ Built ${notes.length} notes`);
-  console.log(`🌐 Site built in ${outputDir}/`);
-  console.log(`📊 Notes index: ${outputDir}/notes.json`);
-}
-
-// Run build
-buildSite(); 
+</html>

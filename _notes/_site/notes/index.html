@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to My Working Notes</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #e9ecef;
+            --bg-panel: rgba(255, 255, 255, 0.98);
+            --bg-nav: rgba(255, 255, 255, 0.95);
+            --text-primary: #1a1a1a;
+            --text-secondary: #2d3748;
+            --text-muted: #666;
+            --accent-primary: #ff6b35;
+            --accent-secondary: #f7931e;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --shadow-light: rgba(0, 0, 0, 0.02);
+            --shadow-medium: rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-panel: rgba(33, 38, 45, 0.98);
+            --bg-nav: rgba(33, 38, 45, 0.95);
+            --text-primary: #f0f6fc;
+            --text-secondary: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent-primary: #ff6b35;
+            --accent-secondary: #f7931e;
+            --border-color: rgba(240, 246, 252, 0.1);
+            --shadow-light: rgba(0, 0, 0, 0.3);
+            --shadow-medium: rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            overflow-x: auto;
+            overflow-y: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .top-nav {
+            background: var(--bg-nav);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 20px;
+            flex-shrink: 0;
+            z-index: 100;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 8px 16px 8px 40px;
+            font-size: 14px;
+            color: var(--text-primary);
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            width: 250px;
+            box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.1);
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px var(--shadow-medium);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .search-result-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .search-result-item.no-results {
+            color: var(--text-muted);
+            cursor: default;
+        }
+
+        .search-result-item.no-results:hover {
+            background: none;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .result-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .match-type {
+            background: var(--accent-primary);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .home-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .home-link:hover {
+            color: var(--accent-primary);
+            transform: translateY(-1px);
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 65px);
+            width: fit-content;
+            min-width: 100vw;
+            overflow-x: auto;
+            overflow-y: hidden;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .note-panel {
+            height: calc(100vh - 65px);
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border-color);
+            flex-shrink: 0;
+            overflow-y: auto;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 0 20px var(--shadow-light);
+            width: calc(100vw / 3);
+            min-width: 400px;
+            max-width: 700px;
+        }
+
+        .note-panel.collapsed {
+            width: 60px;
+            overflow: hidden;
+        }
+
+        .note-panel.collapsed .note-content {
+            padding: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .note-panel.collapsed .note-body,
+        .note-panel.collapsed .note-meta,
+        .note-panel.collapsed .close-button {
+            display: none;
+        }
+
+        .note-panel.collapsed .note-title {
+            font-size: 14px;
+            margin: 0;
+            padding: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transform: rotate(-90deg);
+            transform-origin: center;
+            width: 200px;
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-left: -100px;
+            margin-top: -10px;
+        }
+
+        .note-panel.collapsed .note-title::after {
+            display: none;
+        }
+
+        .note-content {
+            padding: 48px 60px 40px 40px;
+            max-width: 100%;
+            position: relative;
+        }
+
+        .note-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            color: var(--text-primary);
+            line-height: 1.2;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            padding-right: 60px;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+            z-index: 20;
+        }
+
+        .close-button:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        .note-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+        }
+
+        .note-body {
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .note-body p {
+            margin-bottom: 16px;
+        }
+
+        .note-body h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            color: var(--text-primary);
+        }
+
+        .note-body h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 32px 0 16px;
+            color: var(--text-primary);
+        }
+
+        .note-body h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: var(--text-primary);
+        }
+
+        .note-body ul, .note-body ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+
+        .note-body li {
+            margin-bottom: 8px;
+        }
+
+        .note-meta {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .last-modified {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .note-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            cursor: pointer;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .note-link:hover {
+            border-bottom-color: var(--accent-primary);
+        }
+
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 32px;
+        }
+
+        .note-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .note-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px var(--shadow-medium);
+            border-color: var(--accent-primary);
+        }
+
+        .note-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .note-card p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .note-card-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            color: var(--text-muted);
+        }
+
+        /* Mobile-first responsive design */
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 8px 16px;
+                flex-direction: column;
+                gap: 8px;
+                height: auto;
+            }
+
+            .nav-left, .nav-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .search-input {
+                width: 150px;
+            }
+
+            .search-input:focus {
+                width: 180px;
+            }
+
+            .container {
+                height: calc(100vh - 80px);
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .note-panel {
+                width: 100vw;
+                min-width: 100vw;
+            }
+            
+            .note-content {
+                padding: 32px 20px 20px;
+            }
+
+            .note-title {
+                font-size: 24px;
+                padding-right: 50px;
+            }
+
+            .notes-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <div class="nav-left">
+            <a href="/" class="home-link">← BIANCA'S WORKING NOTES</a>
+        </div>
+        <div class="nav-right">
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Search notes..." id="searchInput">
+            </div>
+        </div>
+    </div>
+    <div class="container" id="container">
+        <!-- Home Panel -->
+        <div class="note-panel active" data-note-id="home">
+            <div class="note-content">
+                <h1 class="note-title">Welcome to My Working Notes</h1>
+                <div class="note-body">
+                    <p>Welcome to my digital garden of interconnected thoughts and ideas. This is where I explore concepts, build knowledge, and share insights that accumulate over time.</p>
+<p>Here you&#39;ll find my collection of evergreen notes - ideas that grow and evolve through connections and iterations. Each note represents a building block in my understanding of the world. Check out my work on [[Multipotentiality]] too.</p>
+<h2 id="what-youll-find-here">What You&#39;ll Find Here</h2>
+<ul>
+<li><strong>[[Evergreen Notes]]</strong>: Ideas that develop and mature over time</li>
+<li><strong>[[Knowledge Connections]]</strong>: Links between concepts across domains</li>
+<li><strong>Personal Insights</strong>: My evolving understanding of various topics</li>
+<li><strong>Learning Journey</strong>: The process of building cumulative knowledge</li>
+</ul>
+<h2 id="about-this-space">About This Space</h2>
+<p>This digital garden follows the principles of evergreen note-taking, inspired by Andy Matuschak&#39;s approach. The goal isn&#39;t just to collect information, but to develop insights that compound over time.</p>
+<p>Every note here is designed to be:</p>
+<ul>
+<li><strong>Atomic</strong>: Focused on one core concept</li>
+<li><strong>Connected</strong>: Linked to related ideas</li>
+<li><strong>Evolving</strong>: Updated as understanding deepens</li>
+<li><strong>Useful</strong>: Practical for future thinking and writing</li>
+</ul>
+
+                </div>
+                <div class="note-meta">
+                    <div class="last-modified">
+                        <span>📅</span> Last updated {{ page.last_modified }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced note data with timestamps and intersections
+        const notes = {
+            'evergreen-notes': {
+                title: 'Evergreen notes',
+                lastModified: '2024-01-15',
+                content: `
+                    <p>Evergreen notes are written and organized to accumulate over time. Unlike most notes apps, the goal here isn't to collect information: it's to develop insights.</p>
+                    
+                    <p>Most people take only transient notes. That is, they write temporary reminders and scratch thoughts that they'll use once then abandon. But [[knowledge-work]] can be much more effective when we accumulate insights over time.</p>
+
+                    <h2>Properties of evergreen notes</h2>
+                    <p>Effective evergreen notes share several properties:</p>
+                    <ul>
+                        <li><strong>Atomic:</strong> Each note should be about one thing. This makes them easier to link and helps avoid orphaned ideas.</li>
+                        <li><strong>Concept-oriented:</strong> Notes should be organized around concepts, not projects, people, or sources.</li>
+                        <li><strong>Densely linked:</strong> The real insight comes from the connections between ideas.</li>
+                        <li><strong>Own words:</strong> Writing in your own words forces you to really understand the concept.</li>
+                    </ul>
+
+                    <p>The term "evergreen" comes from the idea that these notes, like evergreen trees, remain useful and "alive" throughout the seasons.</p>
+
+                    <h2>See also</h2>
+                    <p>[[spaced-repetition]] systems use similar principles of iterative refinement.</p>
+                    <p>[[process-over-product]] mindset supports iterative note development.</p>
+                `,
+                linkedNotes: ['Spaced repetition', 'Knowledge work', 'Process over product']
+            },
+            'knowledge-work': {
+                title: 'Knowledge work',
+                lastModified: '2024-01-10',
+                content: `
+                    <p>Knowledge work should accumulate insights over time, but most knowledge workers don't have systems that support this accumulation.</p>
+
+                    <p>The typical pattern is to start fresh with each new project—reading papers, taking notes, then moving on without building lasting understanding. This is incredibly wasteful.</p>
+
+                    <h2>Building cumulative knowledge systems</h2>
+                    <p>Effective knowledge workers develop systems that help insights accumulate:</p>
+
+                    <ul>
+                        <li><strong>[[evergreen-notes]]:</strong> Persistent, developing insights</li>
+                        <li><strong>Regular review:</strong> [[spaced-repetition]] for ideas</li>
+                        <li><strong>Connection-making:</strong> Linking ideas across projects and domains</li>
+                        <li><strong>External thinking:</strong> Using writing to extend cognition</li>
+                    </ul>
+
+                    <p>The goal is to build a "knowledge asset" that grows more valuable over time, rather than starting from zero with each new project.</p>
+
+                    <h2>The compound interest of learning</h2>
+                    <p>Just as compound interest makes money grow exponentially, cumulative knowledge systems can make learning grow exponentially. Each new insight builds on previous insights, creating powerful feedback loops.</p>
+
+                    <p>This principle underlies why [[deep-work]] is so important for knowledge workers.</p>
+                `,
+                linkedNotes: ['Evergreen notes', 'Spaced repetition', 'Deep work', 'Creative work']
+            }
+        };
+
+        // Accordion functionality
+        function openNote(noteId) {
+            const container = document.getElementById('container');
+            const existingPanel = document.querySelector(`[data-note-id="${noteId}"]`);
+            
+            if (existingPanel) {
+                // If panel already exists, just expand it
+                const allPanels = document.querySelectorAll('.note-panel');
+                const panelCount = allPanels.length;
+                
+                if (panelCount > 3) {
+                    // If more than 3 panels, collapse all except the current one
+                    allPanels.forEach(panel => {
+                        panel.classList.remove('active');
+                        panel.classList.add('collapsed');
+                    });
+                    existingPanel.classList.remove('collapsed');
+                    existingPanel.classList.add('active');
+                } else {
+                    // If 3 or fewer panels, ensure all are expanded
+                    allPanels.forEach(panel => {
+                        panel.classList.remove('active');
+                        panel.classList.remove('collapsed');
+                    });
+                    existingPanel.classList.add('active');
+                }
+                
+                // Scroll to the panel
+                container.scrollTo({
+                    left: existingPanel.offsetLeft,
+                    behavior: 'smooth'
+                });
+                return;
+            }
+
+            // Create new panel
+            const note = notes[noteId];
+            if (!note) {
+                console.error('Note not found:', noteId);
+                return;
+            }
+
+            // Check how many panels we'll have after adding this one
+            const currentPanels = document.querySelectorAll('.note-panel');
+            const newPanelCount = currentPanels.length + 1;
+            
+            if (newPanelCount > 3) {
+                // If we'll have more than 3 panels, collapse all existing ones
+                currentPanels.forEach(panel => {
+                    panel.classList.remove('active');
+                    panel.classList.add('collapsed');
+                });
+            } else {
+                // If we'll have 3 or fewer panels, ensure all are expanded
+                currentPanels.forEach(panel => {
+                    panel.classList.remove('active');
+                    panel.classList.remove('collapsed');
+                });
+            }
+
+            // Create new panel
+            const newPanel = document.createElement('div');
+            newPanel.className = 'note-panel active';
+            newPanel.setAttribute('data-note-id', noteId);
+            
+            newPanel.innerHTML = `
+                <button class="close-button" onclick="closePanel('${noteId}')">×</button>
+                <div class="note-content">
+                    <h1 class="note-title">${note.title}</h1>
+                    <div class="note-body">
+                        ${note.content}
+                    </div>
+                    <div class="note-meta">
+                        <div class="last-modified">
+                            <span>📅</span> Last updated ${note.lastModified}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(newPanel);
+
+            // Scroll to the new panel
+            setTimeout(() => {
+                container.scrollTo({
+                    left: newPanel.offsetLeft,
+                    behavior: 'smooth'
+                });
+            }, 100);
+
+            // Convert wiki-links in the new panel
+            const noteBody = newPanel.querySelector('.note-body');
+            if (noteBody) {
+                noteBody.innerHTML = noteBody.innerHTML.replace(
+                    /\[\[([^\]]+)\]\]/g, 
+                    '<a href="#" class="note-link" data-note="$1">$1</a>'
+                );
+                
+                // Add click handlers to all note links
+                noteBody.querySelectorAll('.note-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const targetNote = this.getAttribute('data-note');
+                        if (targetNote) {
+                            // Convert the wiki-link text to the note ID format
+                            const noteId = targetNote.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                            openNote(noteId);
+                        }
+                    });
+                });
+            }
+        }
+
+
+
+        // Close panel function
+        function closePanel(noteId) {
+            const panel = document.querySelector(`[data-note-id="${noteId}"]`);
+            if (panel) {
+                panel.remove();
+                
+                // Handle remaining panels based on count
+                const remainingPanels = document.querySelectorAll('.note-panel');
+                if (remainingPanels.length > 0) {
+                    if (remainingPanels.length <= 3) {
+                        // If 3 or fewer panels, expand all
+                        remainingPanels.forEach(panel => {
+                            panel.classList.remove('collapsed');
+                            panel.classList.add('active');
+                        });
+                    } else {
+                        // If more than 3 panels, keep accordion behavior
+                        const lastPanel = remainingPanels[remainingPanels.length - 1];
+                        remainingPanels.forEach(panel => {
+                            panel.classList.remove('active');
+                            panel.classList.add('collapsed');
+                        });
+                        lastPanel.classList.remove('collapsed');
+                        lastPanel.classList.add('active');
+                    }
+                    
+                    // Scroll to the last panel
+                    const container = document.getElementById('container');
+                    const lastPanel = remainingPanels[remainingPanels.length - 1];
+                    container.scrollTo({
+                        left: lastPanel.offsetLeft,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }
+
+        // Convert Obsidian wiki-links to accordion links
+        function convertWikiLinks() {
+            const noteBody = document.querySelector('.note-body');
+            if (noteBody) {
+                // Convert [[note-name]] to accordion links
+                noteBody.innerHTML = noteBody.innerHTML.replace(
+                    /\[\[([^\]]+)\]\]/g, 
+                    '<a href="#" class="note-link" data-note="$1">$1</a>'
+                );
+                
+                // Add click handlers to all note links
+                noteBody.querySelectorAll('.note-link').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const targetNote = this.getAttribute('data-note');
+                        if (targetNote) {
+                            // Convert the wiki-link text to the note ID format
+                            const noteId = targetNote.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                            openNote(noteId);
+                        }
+                    });
+                });
+            }
+        }
+
+        // Handle note links in the homepage content
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('note-link')) {
+                e.preventDefault();
+                const targetNote = e.target.getAttribute('data-note');
+                if (targetNote) {
+                    openNote(targetNote);
+                }
+            }
+        });
+
+        // Search functionality
+        let searchResults = [];
+        let allNotes = {};
+
+        // Combine static notes with dynamic notes from notes.json
+        async function loadAllNotes() {
+            try {
+                const response = await fetch('/notes.json');
+                const notesData = await response.json();
+                
+                // Add dynamic notes to allNotes
+                notesData.notes.forEach(note => {
+                    allNotes[note.id] = {
+                        title: note.title,
+                        content: note.excerpt || '',
+                        lastModified: note.lastModified,
+                        url: note.url
+                    };
+                });
+            } catch (error) {
+                console.log('Could not load notes.json, using static notes only');
+            }
+            
+            // Add static notes
+            Object.keys(notes).forEach(noteId => {
+                allNotes[noteId] = {
+                    title: notes[noteId].title,
+                    content: notes[noteId].content,
+                    lastModified: notes[noteId].lastModified
+                };
+            });
+        }
+
+        // Search through notes
+        function searchNotes(query) {
+            if (!query.trim()) {
+                hideSearchResults();
+                return;
+            }
+
+            const results = [];
+            const searchTerm = query.toLowerCase();
+
+            Object.keys(allNotes).forEach(noteId => {
+                const note = allNotes[noteId];
+                const titleMatch = note.title.toLowerCase().includes(searchTerm);
+                const contentMatch = note.content.toLowerCase().includes(searchTerm);
+                
+                if (titleMatch || contentMatch) {
+                    results.push({
+                        id: noteId,
+                        title: note.title,
+                        lastModified: note.lastModified,
+                        url: note.url,
+                        matchType: titleMatch ? 'title' : 'content'
+                    });
+                }
+            });
+
+            displaySearchResults(results);
+        }
+
+        // Display search results
+        function displaySearchResults(results) {
+            const searchContainer = document.querySelector('.search-container');
+            let resultsDropdown = document.querySelector('.search-results');
+            
+            if (!resultsDropdown) {
+                resultsDropdown = document.createElement('div');
+                resultsDropdown.className = 'search-results';
+                searchContainer.appendChild(resultsDropdown);
+            }
+
+            if (results.length === 0) {
+                resultsDropdown.innerHTML = '<div class="search-result-item no-results">No notes found</div>';
+            } else {
+                resultsDropdown.innerHTML = results.map(result => `
+                    <div class="search-result-item" onclick="openNoteFromSearch('${result.id}')">
+                        <div class="result-title">${result.title}</div>
+                        <div class="result-meta">
+                            <span class="match-type">${result.matchType}</span>
+                            <span class="last-modified">📅 ${result.lastModified}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            resultsDropdown.style.display = 'block';
+        }
+
+        // Hide search results
+        function hideSearchResults() {
+            const resultsDropdown = document.querySelector('.search-results');
+            if (resultsDropdown) {
+                resultsDropdown.style.display = 'none';
+            }
+        }
+
+        // Open note from search results
+        function openNoteFromSearch(noteId) {
+            openNote(noteId);
+            hideSearchResults();
+            document.getElementById('searchInput').value = '';
+        }
+
+        // Search input event listener
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value;
+            searchNotes(query);
+        });
+
+        // Hide search results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-container')) {
+                hideSearchResults();
+            }
+        });
+
+        // Load notes when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllNotes();
+            convertWikiLinks();
+        });
+    </script>
+</body>
+</html> 

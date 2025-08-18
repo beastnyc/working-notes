@@ -5,7 +5,7 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 // Configuration - UPDATE THESE PATHS
-const OBSIDIAN_VAULT_PATH = '/path/to/your/obsidian/vault/_notes'; // UPDATE THIS
+const OBSIDIAN_VAULT_PATH = '/Users/bianca/Documents/mind/_notes'; // UPDATED
 const WORKING_NOTES_PATH = path.join(__dirname, '_notes');
 const GITHUB_REPO_PATH = __dirname;
 

@@ -3,12 +3,19 @@
     {
       "id": "index",
       "title": "Welcome to My Working Notes",
-      "lastModified": "2025-08-15T00:00:00.000Z",
+      "lastModified": "2025-08-17T00:00:00.000Z",
       "tags": [
         "homepage",
         "digital-garden"
       ],
       "url": "/notes/index.html"
+    },
+    {
+      "id": "multipotentiality",
+      "title": "Multipotentiality",
+      "lastModified": "2025-08-16T00:00:00.000Z",
+      "tags": [],
+      "url": "/notes/multipotentiality.html"
     },
     {
       "id": "knowledge-work",
@@ -20,13 +27,6 @@
         "evergreen"
       ],
       "url": "/notes/knowledge-work.html"
-    },
-    {
-      "id": "multipotentiality",
-      "title": "Multipotentiality",
-      "lastModified": "2025-08-15T00:00:00.000Z",
-      "tags": [],
-      "url": "/notes/multipotentiality.html"
     },
     {
       "id": "evergreen-notes",

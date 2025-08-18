@@ -36,7 +36,7 @@ function copyDirectory(source, destination) {
 function buildSite() {
     console.log('🔨 Building site...');
     try {
-        execSync('npm run build', { cwd: GITHUB_REPO_PATH, stdio: 'inherit' });
+        execSync('/usr/local/bin/npm run build', { cwd: GITHUB_REPO_PATH, stdio: 'inherit' });
         console.log('✅ Site built successfully');
     } catch (error) {
         console.error('❌ Error building site:', error.message);
@@ -52,13 +52,13 @@ function pushToGitHub(commitMessage) {
         process.chdir(GITHUB_REPO_PATH);
         
         // Add all changes
-        execSync('git add .', { stdio: 'inherit' });
+        execSync('/usr/bin/git add .', { stdio: 'inherit' });
         
         // Commit with the provided message
-        execSync(`git commit -m "${commitMessage}"`, { stdio: 'inherit' });
+        execSync(`/usr/bin/git commit -m "${commitMessage}"`, { stdio: 'inherit' });
         
         // Push to GitHub
-        execSync('git push origin main', { stdio: 'inherit' });
+        execSync('/usr/bin/git push origin main', { stdio: 'inherit' });
         
         console.log('✅ Successfully pushed to GitHub!');
         console.log('🌐 Vercel will automatically deploy your changes');

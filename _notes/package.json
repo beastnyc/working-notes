@@ -27,6 +27,9 @@
     "front-matter": "^4.0.2"
   },
   "devDependencies": {
-    "serve": "^14.2.0"
+    "serve": "^14.2.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 } 

@@ -1,8 +1,8 @@
 {
-  "buildCommand": "cd _notes && npm run build",
-  "outputDirectory": "_site",
+  "buildCommand": "./build.sh",
+  "outputDirectory": "_notes/_site",
   "installCommand": "cd _notes && npm install",
-  "framework": null,
+  "framework": "node",
   "rewrites": [
     {
       "source": "/(.*)",

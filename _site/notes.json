@@ -1,26 +1,16 @@
 {
   "notes": [
     {
-      "id": "index",
-      "title": "Welcome to My Working Notes",
-      "lastModified": "2025-08-17T00:00:00.000Z",
-      "tags": [
-        "homepage",
-        "digital-garden"
-      ],
-      "url": "/notes/index.html"
-    },
-    {
       "id": "multipotentiality",
       "title": "Multipotentiality",
-      "lastModified": "2025-08-16T00:00:00.000Z",
+      "lastModified": "2025-08-16",
       "tags": [],
       "url": "/notes/multipotentiality.html"
     },
     {
       "id": "knowledge-work",
       "title": "Knowledge work",
-      "lastModified": "2025-08-15T00:00:00.000Z",
+      "lastModified": "2025-08-15",
       "tags": [
         "productivity",
         "learning",
@@ -29,9 +19,19 @@
       "url": "/notes/knowledge-work.html"
     },
     {
+      "id": "index",
+      "title": "Welcome to My Working Notes",
+      "lastModified": "2025-01-27",
+      "tags": [
+        "homepage",
+        "digital-garden"
+      ],
+      "url": "/notes/index.html"
+    },
+    {
       "id": "evergreen-notes",
       "title": "Evergreen notes",
-      "lastModified": "2024-01-15T00:00:00.000Z",
+      "lastModified": "2024-01-15",
       "tags": [
         "knowledge-work",
         "note-taking",

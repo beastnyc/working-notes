@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "Working Notes Digital Garden",
   "scripts": {
-    "build": "cd _notes && npm install && npm run build",
-    "dev": "cd _notes && npm run dev"
+    "build": "cd \"Mind Garden\" && npm install && npm run build",
+    "dev": "cd \"Mind Garden\" && npm run dev"
   },
   "engines": {
     "node": ">=18.0.0"

@@ -1,0 +1,12 @@
+{
+  "name": "working-notes-site",
+  "version": "1.0.0",
+  "description": "Working Notes Digital Garden",
+  "scripts": {
+    "build": "cd \"Mind Garden\" && npm install && npm run build",
+    "dev": "cd \"Mind Garden\" && npm run dev"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

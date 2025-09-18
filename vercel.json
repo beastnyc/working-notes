@@ -1,11 +1,11 @@
 {
-  "buildCommand": "./build.sh",
+  "framework": null,
   "outputDirectory": "_site",
-  "installCommand": "cd _notes && npm install",
+  "buildCommand": "npm install && npm run build",
   "rewrites": [
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
-} 
+}

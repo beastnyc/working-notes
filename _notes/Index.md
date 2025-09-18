@@ -2,14 +2,14 @@
 layout: homepage
 title: Welcome to My Working Notes
 description: A collection of interconnected thoughts and ideas
-last_modified: 2025-09-17
+last_modified: 2025-09-18
 tags:
   - homepage
   - digital-garden
-created: "2025-08-14"
+created: 2025-08-14
 last: "2025-09-17 "
 ---
-![[Attachments/Gloomy Girl.png]]
+![[gloomy girl.png]]
 
 Welcome to my digital garden of interconnected thoughts and ideas. This is where I explore concepts, build knowledge, and share insights that accumulate over time.
 
@@ -19,8 +19,8 @@ Welcome to my digital garden of interconnected thoughts and ideas. This is where
 
 - **[[Evergreen Notes]]**: Ideas that develop and mature over time
 - **[[Knowledge Connections]]**: Links between concepts across domains
-- **Personal Insights**: My evolving understanding of various topics
-- **Learning Journey**: The process of building cumulative knowledge
+- **[[Personal Insights]]**: My evolving understanding of various topics
+- **[[Learning Journey]]**: The process of building cumulative knowledge
 
 ## About This Space
 

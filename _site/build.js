@@ -12,16 +12,34 @@ marked.setOptions({
   headerIds: true
 });
 
-// Convert Obsidian image embeds and normalize image paths
+// Convert Obsidian embeds for images/videos and normalize asset paths
 function convertImages(text) {
-  // ![[file.png]] or ![[file.png|Alt text]]
+  // Handle Obsidian embeds: ![[file.ext]] or ![[file.ext|Alt]]
   text = text.replace(/!\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (m, file, alt) => {
     const filename = file.trim();
     const altText = (alt || filename).trim();
+    const ext = filename.split('.').pop().toLowerCase();
+    const videoExts = new Set(['mp4','webm','ogg','mov']);
+    if (videoExts.has(ext)) {
+      return `<video controls preload="metadata" src="/attachments/${filename}"></video>`;
+    }
     return `<img src="/attachments/${filename}" alt="${altText}">`;
   });
-  // Standard Markdown image paths pointing to Attachments/... -> /attachments/...
+
+  // Standard Markdown images: rewrite Attachments path to /attachments
   text = text.replace(/(!\[[^\]]*\]\()\.?(?:\.\/)?Attachments\//g, '$1/attachments/');
+
+  // Standard Markdown media using image syntax but with video files => convert to <video>
+  text = text.replace(/!\[[^\]]*\]\(([^)]+)\)/g, (m, p1) => {
+    const url = p1.trim();
+    const clean = url.replace(/^\.?\/?Attachments\//, '/attachments/');
+    const ext = clean.split('.').pop().toLowerCase();
+    if (['mp4','webm','ogg','mov'].includes(ext)) {
+      return `<video controls preload="metadata" src="${clean}"></video>`;
+    }
+    return m; // leave normal images alone
+  });
+
   return text;
 }
 

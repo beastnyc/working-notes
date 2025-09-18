@@ -29,3 +29,5 @@ The term "evergreen" comes from the idea that these notes, like evergreen trees,
 
 [[spaced-repetition]] systems use similar principles of iterative refinement.
 [[process-over-product]] mindset supports iterative note development. 
+
+<!-- Test sync trigger: updated via automation -->

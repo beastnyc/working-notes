@@ -33,16 +33,4 @@ Every note here is designed to be:
 - **Useful**: Practical for future thinking and writing
 
 
-<!-- Trigger sync test: $(date) -->
-
-
-<!-- Sync trigger: 2025-09-18T20:41:44.213242 UTC -->
-
-
-<!-- Sync trigger 2: 2025-09-18T20:44:18.852678 UTC -->
-
-
-<!-- Auto-merge sync trigger: 2025-09-18T21:10:21.658387+00:00 -->
-
-
-<!-- Sync trigger (single-PR): 2025-09-18T21:14:11.471923+00:00 -->
+test

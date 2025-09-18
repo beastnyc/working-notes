@@ -21,6 +21,8 @@ Welcome to my digital garden of interconnected thoughts and ideas. This is where
 
 **🎯 FINAL TEST** - Testing complete automation with package.json build script fix!
 
+**💯 ULTIMATE TEST** - Testing with package.json in _notes for Vercel deployment!
+
 [[Here]] you'll find my collection of evergreen notes - ideas that grow and evolve through connections and iterations. Each note represents a building block in my understanding of the world. Check out my work on [[Multipotentiality]] too
 
 ## What You'll Find Here

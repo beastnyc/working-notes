@@ -53,3 +53,6 @@ Every note here is designed to be:
 
 
 <!-- Auto-merge sync trigger: 2025-09-18T21:10:21.658387+00:00 -->
+
+
+<!-- Sync trigger (single-PR): 2025-09-18T21:14:11.471923+00:00 -->

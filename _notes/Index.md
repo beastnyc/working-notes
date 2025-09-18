@@ -9,7 +9,7 @@ tags:
 created: "2025-08-14"
 last: "2025-09-17 "
 ---
-![[social_binkyb6220_style_magazine_cover_of_a_runner_in_a_runway_--ar__b4c66971-2c51-4653-acda-f561299b3c2a_0.mp4]]
+![[Attachments/Gloomy Girl.png]]
 
 Welcome to my digital garden of interconnected thoughts and ideas. This is where I explore concepts, build knowledge, and share insights that accumulate over time.
 

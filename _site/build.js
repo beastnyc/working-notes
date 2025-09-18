@@ -16,7 +16,8 @@ marked.setOptions({
 function convertImages(text) {
   // Handle Obsidian embeds: ![[file.ext]] or ![[file.ext|Alt]]
   text = text.replace(/!\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (m, file, alt) => {
-    const filename = file.trim();
+    const raw = file.trim();
+    const filename = raw.replace(/^\.?\/?(?:Attachments|attachments)\//, '');
     const altText = (alt || filename).trim();
     const ext = filename.split('.').pop().toLowerCase();
     const videoExts = new Set(['mp4','webm','ogg','mov']);
@@ -32,7 +33,7 @@ function convertImages(text) {
   // Standard Markdown media using image syntax but with video files => convert to <video>
   text = text.replace(/!\[[^\]]*\]\(([^)]+)\)/g, (m, p1) => {
     const url = p1.trim();
-    const clean = url.replace(/^\.?\/?Attachments\//, '/attachments/');
+    const clean = url.replace(/^\.?\/?(?:Attachments|attachments)\//, '/attachments/');
     const ext = clean.split('.').pop().toLowerCase();
     if (['mp4','webm','ogg','mov'].includes(ext)) {
       return `<video controls preload="metadata" src="${clean}"></video>`;

@@ -12,6 +12,33 @@ marked.setOptions({
   headerIds: true
 });
 
+// Convert Obsidian image embeds and normalize image paths
+function convertImages(text) {
+  // ![[file.png]] or ![[file.png|Alt text]]
+  text = text.replace(/!\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (m, file, alt) => {
+    const filename = file.trim();
+    const altText = (alt || filename).trim();
+    return `<img src="/attachments/${filename}" alt="${altText}">`;
+  });
+  // Standard Markdown image paths pointing to Attachments/... -> /attachments/...
+  text = text.replace(/(!\[[^\]]*\]\()\.?(?:\.\/)?Attachments\//g, '$1/attachments/');
+  return text;
+}
+
+function copyDirRecursive(src, dest) {
+  if (!fs.existsSync(src)) return;
+  if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const s = path.join(src, entry.name);
+    const d = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyDirRecursive(s, d);
+    } else if (entry.isFile()) {
+      fs.copyFileSync(s, d);
+    }
+  }
+}
+
 // Convert Obsidian wiki-links to HTML links
 function convertWikiLinks(text) {
   return text.replace(/\[\[([^\]]+)\]\]/g, (match, linkText) => {
@@ -44,6 +71,12 @@ function buildSite() {
     }
   });
   
+  // Copy attachments if present
+  if (fs.existsSync('attachments')) {
+    copyDirRecursive('attachments', path.join(outputDir, 'attachments'));
+    console.log('🖼️  Copied attachments to _site/attachments');
+  }
+  
   // Process notes
   const notesDirPath = '_notes';
   const notes = [];
@@ -56,8 +89,9 @@ function buildSite() {
       const content = fs.readFileSync(filePath, 'utf8');
       const { attributes, body } = frontMatter(content);
       
-      // Convert markdown to HTML
-      let htmlContent = marked(body);
+      // Convert images and wiki links, then to HTML
+      const withImages = convertImages(body);
+      let htmlContent = marked(withImages);
       htmlContent = convertWikiLinks(htmlContent);
       
       // Create note ID from filename

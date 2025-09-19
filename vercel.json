@@ -2,10 +2,5 @@
   "framework": null,
   "outputDirectory": "_site",
   "installCommand": "npm install",
-  "buildCommand": "npm run build",
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/notes/.*", "dest": "/index.html" },
-    { "src": "^/$", "dest": "/index.html" }
-  ]
+  "buildCommand": "npm run build"
 }

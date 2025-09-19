@@ -10,6 +10,7 @@ created: 2025-08-14
 last: "2025-09-17 "
 ---
 ![[gloomy-girl.png]]
+
 Welcome to my digital garden of interconnected thoughts and ideas. This is where I explore concepts, build knowledge, and share insights that accumulate over time.
 
 [[Here]] you'll find my collection of evergreen notes - ideas that grow and evolve through connections and iterations. Each note represents a building block in my understanding of the world. Check out my work on [[Multipotentiality]] too

@@ -254,6 +254,8 @@ function buildSite() {
             height: calc(100vh - 65px);
             width: fit-content;
             min-width: 100vw;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .note-panel {
@@ -458,7 +460,7 @@ function buildSite() {
 </head>
 <body>
     <div class="top-nav">
-        <div class="nav-left"><div class="site-title">Bianca's Mind Garden</div></div>
+        <div class="nav-left"><a href="/" class="site-title">Bianca's Mind Garden</a></div>
         <div class="nav-right">
             <div class="search-container">
                 <span class="search-icon">🔍</span>
@@ -603,6 +605,8 @@ function buildSite() {
                     const ids = params.getAll('stackedNotes');
                     ids.forEach(id => openNote('/notes/' + id + '.html', { pushState: false }));
                 } catch (e) { console.warn('Restore stack failed', e); }
+                // Ensure the initial pre-rendered panel gets labeled for widths
+                try { relabelPanels(); } catch {}
             });
             function relabelPanels() {
                 const panels = Array.from(container.querySelectorAll('.note-panel'));

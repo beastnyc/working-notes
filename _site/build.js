@@ -600,7 +600,8 @@ function buildSite() {
                     e.preventDefault();
                     return;
                 }
-                const link = e.target.closest('.note-link');
+                // Intercept internal note links broadly: data-note, .note-link, or href starts with /notes/
+                const link = (e.target.closest && (e.target.closest('a[data-note], a.note-link, a[href^="/notes/"]')));
                 if (!link) return;
                 const panelEl = e.target.closest('.note-panel');
                 if (!panelEl) return;
@@ -620,6 +621,7 @@ function buildSite() {
                     container.removeChild(panels[i]);
                 }
                 // Open the next note as a new panel to the right
+                try { console.info('[Stack] openNote (vanilla):', href); } catch {}
                 openNote(href, { pushState: true, baseIndex: clickedIndexFull });
             });
 

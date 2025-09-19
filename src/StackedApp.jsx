@@ -69,13 +69,14 @@ export default function StackedApp({ initial, maxPanels = 3 }) {
   }
 
   function onClick(e) {
-    const link = e.target.closest && e.target.closest('.note-link');
+    const link = e.target.closest && e.target.closest('a[data-note], a.note-link, a[href^="/notes/"]');
     if (!link) return;
     const href = link.getAttribute('href');
     if (!(href && href.startsWith('/notes/'))) return;
     e.preventDefault();
     const panelEl = e.target.closest('.note-panel');
     const idx = Array.from(ref.current.querySelectorAll('.note-panel')).indexOf(panelEl);
+    try { console.info('[Stack] openNote (react):', href); } catch {}
     openNote(href, idx);
   }
 
@@ -98,4 +99,3 @@ export default function StackedApp({ initial, maxPanels = 3 }) {
     </div>
   );
 }
-

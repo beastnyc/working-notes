@@ -14,6 +14,7 @@ function boot() {
     if (cont) cont.style.display = 'none';
     rootEl.style.display = 'block';
     console.info('[Stack] Mode: React');
+    if (window.__setStackBadge) window.__setStackBadge('React');
   } catch {}
   createRoot(rootEl).render(
     React.createElement(StackedApp, { initial: { title, body } })

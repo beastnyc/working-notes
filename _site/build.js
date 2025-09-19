@@ -172,6 +172,22 @@ function buildSite() {
             box-sizing: border-box;
         }
 
+        /* Small on-page mode badge */
+        .stack-badge {
+            position: fixed;
+            top: 8px;
+            right: 8px;
+            z-index: 9999;
+            font: 12px/1.2 -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+            color: #111;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 6px;
+            padding: 6px 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            pointer-events: none;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
@@ -503,9 +519,23 @@ function buildSite() {
 
         // Multi-panel navigation: open links to the right (max 3 panels)
         (function() {
+            // Expose a tiny helper to show mode as a badge
+            function setStackBadge(mode){
+                try {
+                    let el = document.getElementById('stack-badge');
+                    if (!el){
+                        el = document.createElement('div');
+                        el.id = 'stack-badge';
+                        el.className = 'stack-badge';
+                        document.body.appendChild(el);
+                    }
+                    el.textContent = 'Stack: ' + mode;
+                } catch {}
+            }
+            try { window.__setStackBadge = setStackBadge; } catch {}
             const MAX_PANELS = 3;
             const container = document.getElementById('container');
-            try { if (!window.__STACKED_REACT__) console.info('[Stack] Mode: Vanilla fallback'); } catch {}
+            try { if (!window.__STACKED_REACT__) { console.info('[Stack] Mode: Vanilla fallback'); setStackBadge('Vanilla'); } } catch {}
 
             function getIdFromHref(href) {
                 try {

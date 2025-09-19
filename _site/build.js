@@ -505,21 +505,21 @@ function buildSite() {
                 } catch { return null; }
             }
 
-            function updateURLStack(newId) {
+            function updateURLStack(newId, baseIndex) {
                 const url = new URL(window.location.href);
                 const params = url.searchParams;
                 const existing = params.getAll('stackedNotes').filter(Boolean);
-                if (newId) {
-                    if (!existing.includes(newId)) existing.push(newId);
-                }
+                const start = Number.isFinite(baseIndex) && baseIndex >= 0 ? baseIndex + 1 : existing.length;
+                const trimmedBase = existing.slice(0, start);
+                if (newId) trimmedBase.push(newId);
                 // Limit to last 3 ids in URL
-                const trimmed = existing.slice(-3);
+                const trimmed = trimmedBase.slice(-3);
                 params.delete('stackedNotes');
                 trimmed.forEach(id => params.append('stackedNotes', id));
                 history.pushState({ stackedNotes: trimmed }, '', url);
             }
 
-            async function openNote(url, { pushState = true } = {}) {
+            async function openNote(url, { pushState = true, baseIndex = null } = {}) {
                 try {
                     // Ensure .html for fetch
                     let fetchUrl = url;
@@ -559,7 +559,7 @@ function buildSite() {
 
                     if (pushState) {
                         const id = getIdFromHref(url);
-                        if (id) updateURLStack(id);
+                        if (id) updateURLStack(id, baseIndex);
                     }
                 } catch (err) {
                     console.error(err);
@@ -569,15 +569,26 @@ function buildSite() {
 
             document.addEventListener('click', function(e) {
                 const link = e.target.closest('.note-link');
-                if (link) {
-                    e.preventDefault();
-                    const href = link.getAttribute('href');
-                    if (href && href.startsWith('/notes/')) {
-                        openNote(href);
-                    } else if (href) {
-                        window.location.href = href;
-                    }
+                if (!link) return;
+                const panelEl = e.target.closest('.note-panel');
+                if (!panelEl) return;
+                e.preventDefault();
+                const href = link.getAttribute('href');
+                if (!(href && href.startsWith('/notes/'))) {
+                    if (href) window.location.href = href;
+                    return;
                 }
+                // Determine which panel the click came from and truncate to that point
+                const panels = Array.from(container.querySelectorAll('.note-panel'));
+                const fullPanels = panels.filter(p => !p.classList.contains('collapsed'));
+                const clickedIndexAll = panels.indexOf(panelEl);
+                const clickedIndexFull = fullPanels.indexOf(panelEl);
+                // Remove panels to the right of the clicked one
+                for (let i = panels.length - 1; i > clickedIndexAll; i--) {
+                    container.removeChild(panels[i]);
+                }
+                // Open the next note as a new panel to the right
+                openNote(href, { pushState: true, baseIndex: clickedIndexFull });
             });
 
             // Restore stacked notes from URL on load

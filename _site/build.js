@@ -62,7 +62,7 @@ function copyDirRecursive(src, dest) {
 function convertWikiLinks(text) {
   return text.replace(/\[\[([^\]]+)\]\]/g, (match, linkText) => {
     const noteId = linkText.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    return `<a href="/notes/${noteId}" class="note-link">${linkText}</a>`;
+    return `<a href="/notes/${noteId}.html" class="note-link">${linkText}</a>`;
   });
 }
 
@@ -264,13 +264,32 @@ function buildSite() {
             position: relative;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 0 0 20px var(--shadow-light);
-            width: 600px;
+            width: 50vw;
+            min-width: 420px;
         }
 
         .note-content {
             padding: 48px 60px 40px 40px;
             max-width: 100%;
             position: relative;
+        }
+
+        /* Collapsed (leftmost) panel shows vertical title only */
+        .note-panel.collapsed {
+            width: 36px;
+            min-width: 36px;
+            max-width: 36px;
+            overflow: hidden;
+            padding: 0;
+        }
+        .note-panel.collapsed .note-content {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            padding: 8px 6px;
+        }
+        .note-panel.collapsed .note-body,
+        .note-panel.collapsed .note-meta {
+            display: none;
         }
 
         .note-title {
@@ -417,10 +436,8 @@ function buildSite() {
                 -webkit-overflow-scrolling: touch;
             }
 
-            .note-panel {
-                width: 100vw;
-                min-width: 100vw;
-            }
+            .note-panel { width: 100vw; min-width: 100vw; }
+            .note-panel.collapsed { display: none; }
             
             .note-content {
                 padding: 32px 20px 20px;
@@ -480,9 +497,34 @@ function buildSite() {
             const MAX_PANELS = 3;
             const container = document.getElementById('container');
 
-            async function openNote(url) {
+            function getIdFromHref(href) {
                 try {
-                    const res = await fetch(url, { credentials: 'same-origin' });
+                    const u = new URL(href, window.location.origin);
+                    const m = u.pathname.match(/\/notes\/([^/.]+)(?:\.html)?$/);
+                    return m ? m[1] : null;
+                } catch { return null; }
+            }
+
+            function updateURLStack(newId) {
+                const url = new URL(window.location.href);
+                const params = url.searchParams;
+                const existing = params.getAll('stackedNotes').filter(Boolean);
+                if (newId) {
+                    if (!existing.includes(newId)) existing.push(newId);
+                }
+                // Limit to last 3 ids in URL
+                const trimmed = existing.slice(-3);
+                params.delete('stackedNotes');
+                trimmed.forEach(id => params.append('stackedNotes', id));
+                history.pushState({ stackedNotes: trimmed }, '', url);
+            }
+
+            async function openNote(url, { pushState = true } = {}) {
+                try {
+                    // Ensure .html for fetch
+                    let fetchUrl = url;
+                    if (!/\.html($|\?)/.test(fetchUrl)) fetchUrl = url.replace(/(\/notes\/[^/?#]+)(.*)$/, '$1.html$2');
+                    const res = await fetch(fetchUrl, { credentials: 'same-origin' });
                     if (!res.ok) throw new Error('Failed to load note: ' + url);
                     const html = await res.text();
                     const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -498,14 +540,27 @@ function buildSite() {
                       + '<div class="note-body">' + body + '</div>'
                       + '</div>';
 
-                    // Limit to MAX_PANELS by removing from the left if needed
-                    const panels = container.querySelectorAll('.note-panel');
-                    if (panels.length >= MAX_PANELS) {
-                        container.removeChild(panels[0]);
+                    // Manage collapsed left strip + up to 3 full panels
+                    const panels = Array.from(container.querySelectorAll('.note-panel'));
+                    const fullPanels = panels.filter(p => !p.classList.contains('collapsed'));
+                    if (fullPanels.length >= MAX_PANELS) {
+                        const first = panels[0];
+                        if (first && !first.classList.contains('collapsed')) {
+                            first.classList.add('collapsed');
+                        } else if (first && first.classList.contains('collapsed')) {
+                            // Already collapsed; drop it to keep only one collapsed strip
+                            container.removeChild(first);
+                        }
                     }
                     container.appendChild(panel);
-                    // Scroll to the right to show the newest panel
-                    container.scrollLeft = container.scrollWidth;
+                    // Scroll so two full panels are visible and third partially
+                    const vw = container.clientWidth || window.innerWidth;
+                    container.scrollLeft = Math.max(0, container.scrollWidth - vw * 0.75);
+
+                    if (pushState) {
+                        const id = getIdFromHref(url);
+                        if (id) updateURLStack(id);
+                    }
                 } catch (err) {
                     console.error(err);
                     window.location.href = url; // fallback to navigation
@@ -523,6 +578,15 @@ function buildSite() {
                         window.location.href = href;
                     }
                 }
+            });
+
+            // Restore stacked notes from URL on load
+            window.addEventListener('DOMContentLoaded', () => {
+                try {
+                    const params = new URL(window.location.href).searchParams;
+                    const ids = params.getAll('stackedNotes');
+                    ids.forEach(id => openNote('/notes/' + id + '.html', { pushState: false }));
+                } catch (e) { console.warn('Restore stack failed', e); }
             });
         })();
     </script>

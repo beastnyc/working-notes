@@ -7,6 +7,13 @@ function boot() {
   if (!rootEl) return;
   const title = (document.querySelector('.note-title') || {}).textContent || 'Note';
   const body = (document.querySelector('.note-body') || {}).innerHTML || '';
+  // Signal that React is handling stacking; hide static container, show root
+  try {
+    window.__STACKED_REACT__ = true;
+    const cont = document.getElementById('container');
+    if (cont) cont.style.display = 'none';
+    rootEl.style.display = 'block';
+  } catch {}
   createRoot(rootEl).render(
     React.createElement(StackedApp, { initial: { title, body } })
   );
@@ -17,4 +24,3 @@ if (document.readyState === 'loading') {
 } else {
   boot();
 }
-

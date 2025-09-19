@@ -62,7 +62,7 @@ function copyDirRecursive(src, dest) {
 function convertWikiLinks(text) {
   return text.replace(/\[\[([^\]]+)\]\]/g, (match, linkText) => {
     const noteId = linkText.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-    return `<a href="/notes/${noteId}.html" class="note-link">${linkText}</a>`;
+    return `<a href="/notes/${noteId}.html" class="note-link" data-note="${noteId}">${linkText}</a>`;
   });
 }
 
@@ -499,10 +499,6 @@ function buildSite() {
 
         // Multi-panel navigation: open links to the right (max 3 panels)
         (function() {
-            // If React will mount (#stack-root present and module script loads), skip vanilla stacking
-            if (document.getElementById('stack-root')) {
-                return;
-            }
             const MAX_PANELS = 3;
             const container = document.getElementById('container');
 
@@ -578,6 +574,8 @@ function buildSite() {
             }
 
             document.addEventListener('click', function(e) {
+                // If React app is mounted, let it handle stacking
+                if (window && window.__STACKED_REACT__) return;
                 // Click-to-expand for collapsed left strip (first column)
                 const collapsedPanel = e.target.closest && e.target.closest('.note-panel.collapsed');
                 if (collapsedPanel) {
@@ -622,6 +620,7 @@ function buildSite() {
 
             // Restore stacked notes from URL on load
             window.addEventListener('DOMContentLoaded', () => {
+                if (window && window.__STACKED_REACT__) return; // React will restore
                 try {
                     const params = new URL(window.location.href).searchParams;
                     const ids = params.getAll('stackedNotes');

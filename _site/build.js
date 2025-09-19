@@ -251,30 +251,34 @@ function buildSite() {
 
         .container {
             display: flex;
+            align-items: stretch;
             height: calc(100vh - 65px);
-            width: auto;
+            width: 100%;
             min-width: 100vw;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
+            gap: 0;
         }
 
         .note-panel {
+            box-sizing: border-box;
             height: calc(100vh - 65px);
             background: var(--bg-panel);
             border-right: 1px solid var(--border-color);
-            flex: 0 0 auto; /* Safari: ensure panels occupy width side-by-side */
             overflow-y: auto;
             position: relative;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 0 0 20px var(--shadow-light);
-            width: 60vw;
-            min-width: 520px;
+            /* Guarantee side-by-side: fixed flex-basis per panel slot */
+            flex: 0 0 var(--panel-width, 52rem);
+            width: var(--panel-width, 52rem);
+            max-width: 90vw;
         }
 
-        /* Deterministic widths for stacked panels (desktop) */
-        .note-panel.panel-1 { width: 60vw; min-width: 520px; }
-        .note-panel.panel-2 { width: 42vw; min-width: 440px; }
-        .note-panel.panel-3 { width: 34vw; min-width: 360px; }
+        /* Deterministic widths (desktop). Using rem to guarantee columns even on narrow viewports */
+        .note-panel.panel-1 { --panel-width: 56rem; }
+        .note-panel.panel-2 { --panel-width: 42rem; }
+        .note-panel.panel-3 { --panel-width: 34rem; }
 
         .note-content {
             padding: 48px 60px 40px 40px;
@@ -445,7 +449,7 @@ function buildSite() {
                 -webkit-overflow-scrolling: touch;
             }
 
-            .note-panel { width: 100vw; min-width: 100vw; }
+            .note-panel { --panel-width: 100vw; width: 100vw; flex-basis: 100vw; }
             .note-panel.collapsed { display: none; }
             
             .note-content {

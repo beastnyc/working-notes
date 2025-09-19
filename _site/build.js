@@ -264,9 +264,14 @@ function buildSite() {
             position: relative;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 0 0 20px var(--shadow-light);
-            width: 50vw;
-            min-width: 420px;
+            width: 60vw;
+            min-width: 520px;
         }
+
+        /* Deterministic widths for stacked panels (desktop) */
+        .note-panel.panel-1 { width: 60vw; min-width: 520px; }
+        .note-panel.panel-2 { width: 42vw; min-width: 440px; }
+        .note-panel.panel-3 { width: 34vw; min-width: 360px; }
 
         .note-content {
             padding: 48px 60px 40px 40px;
@@ -553,9 +558,10 @@ function buildSite() {
                         }
                     }
                     container.appendChild(panel);
+                    relabelPanels();
                     // Scroll so two full panels are visible and third partially
                     const vw = container.clientWidth || window.innerWidth;
-                    container.scrollLeft = Math.max(0, container.scrollWidth - vw * 0.75);
+                    container.scrollLeft = Math.max(0, container.scrollWidth - vw * 0.8);
 
                     if (pushState) {
                         const id = getIdFromHref(url);
@@ -599,6 +605,22 @@ function buildSite() {
                     ids.forEach(id => openNote('/notes/' + id + '.html', { pushState: false }));
                 } catch (e) { console.warn('Restore stack failed', e); }
             });
+            function relabelPanels() {
+                const panels = Array.from(container.querySelectorAll('.note-panel'));
+                panels.forEach(p => p.classList.remove('panel-1','panel-2','panel-3'));
+                const fullPanels = panels.filter(p => !p.classList.contains('collapsed'));
+                const lastThree = fullPanels.slice(-3);
+                if (lastThree.length === 3) {
+                    lastThree[0].classList.add('panel-1');
+                    lastThree[1].classList.add('panel-2');
+                    lastThree[2].classList.add('panel-3');
+                } else if (lastThree.length === 2) {
+                    lastThree[0].classList.add('panel-1');
+                    lastThree[1].classList.add('panel-2');
+                } else if (lastThree.length === 1) {
+                    lastThree[0].classList.add('panel-1');
+                }
+            }
         })();
     </script>
 </body>

@@ -300,6 +300,20 @@ function buildSite() {
             line-height: 1.7;
         }
 
+        /* Make embedded media responsive */
+        .note-body img,
+        .note-body video {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 16px 0;
+            border-radius: 8px;
+        }
+
+        .note-body video {
+            width: 100%;
+        }
+
         .note-body p {
             margin-bottom: 16px;
         }

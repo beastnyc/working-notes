@@ -252,7 +252,7 @@ function buildSite() {
         .container {
             display: flex;
             height: calc(100vh - 65px);
-            width: fit-content;
+            width: auto;
             min-width: 100vw;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -262,7 +262,7 @@ function buildSite() {
             height: calc(100vh - 65px);
             background: var(--bg-panel);
             border-right: 1px solid var(--border-color);
-            flex-shrink: 0;
+            flex: 0 0 auto; /* Safari: ensure panels occupy width side-by-side */
             overflow-y: auto;
             position: relative;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);

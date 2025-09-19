@@ -2,14 +2,20 @@
 created: 2025-09-18
 last_modified: 2025-09-18
 layout: note
-title:
+title: Personal Insights
 tags:
 ---
 
 
-Knowledge work should accumulate insights over time, but most knowledge workers don't have systems that support this accumulation.
+Welcome to my digital garden of interconnected thoughts and ideas. This is where I explore concepts, build knowledge, and share insights that accumulate over time.
 
-The typical pattern is to start fresh with each new project—reading papers, taking notes, then moving on without building lasting understanding. This is incredibly wasteful.
+[[Here]] you'll find my collection of evergreen notes - ideas that grow and evolve through connections and iterations. Each note represents a building block in my understanding of the world. Check out my work on [[Multipotentiality]] too
 
+## What You'll Find Here
+
+- **[[Evergreen Notes]]**: Ideas that develop and mature over time
+- **[[Knowledge Connections]]**: Links between concepts across domains
+- **[[Personal Insights]]**: My evolving understanding of various topics
+- **[[Learning Journey]]**: The process of building cumulative knowledge
 
 

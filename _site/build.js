@@ -289,6 +289,7 @@ function buildSite() {
             max-width: 36px;
             overflow: hidden;
             padding: 0;
+            cursor: pointer;
         }
         .note-panel.collapsed .note-content {
             writing-mode: vertical-rl;
@@ -577,6 +578,25 @@ function buildSite() {
             }
 
             document.addEventListener('click', function(e) {
+                // Click-to-expand for collapsed left strip (first column)
+                const collapsedPanel = e.target.closest && e.target.closest('.note-panel.collapsed');
+                if (collapsedPanel) {
+                    // Expand the collapsed panel and, if we now exceed MAX_PANELS full panels,
+                    // collapse the next panel to the right to keep the history strip.
+                    collapsedPanel.classList.remove('collapsed');
+                    const panelsAll = Array.from(container.querySelectorAll('.note-panel'));
+                    const fullAfter = panelsAll.filter(p => !p.classList.contains('collapsed'));
+                    if (fullAfter.length > MAX_PANELS) {
+                        // Collapse the next panel to the right (index 1), if present
+                        const next = panelsAll[1];
+                        if (next) next.classList.add('collapsed');
+                    }
+                    relabelPanels();
+                    // Bring expanded panel into view on the left
+                    container.scrollLeft = Math.max(0, container.scrollLeft - 200);
+                    e.preventDefault();
+                    return;
+                }
                 const link = e.target.closest('.note-link');
                 if (!link) return;
                 const panelEl = e.target.closest('.note-panel');

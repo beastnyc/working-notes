@@ -469,22 +469,64 @@ function buildSite() {
     </div>
 
     <script>
-        // Simple search functionality
+        // Simple search functionality (placeholder)
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const query = e.target.value.toLowerCase();
             console.log('Searching for:', query);
         });
 
-        // Handle note links
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('note-link')) {
-                e.preventDefault();
-                const href = e.target.getAttribute('href');
-                if (href && href.startsWith('/')) {
-                    window.location.href = href;
+        // Multi-panel navigation: open links to the right (max 3 panels)
+        (function() {
+            const MAX_PANELS = 3;
+            const container = document.getElementById('container');
+
+            async function openNote(url) {
+                try {
+                    const res = await fetch(url, { credentials: 'same-origin' });
+                    if (!res.ok) throw new Error('Failed to load note: ' + url);
+                    const html = await res.text();
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    const titleEl = doc.querySelector('.note-title');
+                    const bodyEl = doc.querySelector('.note-body');
+                    const title = titleEl ? titleEl.textContent : 'Note';
+                    const body = bodyEl ? bodyEl.innerHTML : '<p>Content unavailable.</p>';
+
+                    const panel = document.createElement('div');
+                    panel.className = 'note-panel';
+                    panel.innerHTML = `
+                        <div class="note-content">
+                            <h1 class="note-title">${title}</h1>
+                            <div class="note-body">${body}</div>
+                        </div>
+                    `;
+
+                    // Limit to MAX_PANELS by removing from the left if needed
+                    const panels = container.querySelectorAll('.note-panel');
+                    if (panels.length >= MAX_PANELS) {
+                        container.removeChild(panels[0]);
+                    }
+                    container.appendChild(panel);
+                    // Scroll to the right to show the newest panel
+                    container.scrollLeft = container.scrollWidth;
+                } catch (err) {
+                    console.error(err);
+                    window.location.href = url; // fallback to navigation
                 }
             }
-        });
+
+            document.addEventListener('click', function(e) {
+                const link = e.target.closest('.note-link');
+                if (link) {
+                    e.preventDefault();
+                    const href = link.getAttribute('href');
+                    if (href && href.startsWith('/notes/')) {
+                        openNote(href);
+                    } else if (href) {
+                        window.location.href = href;
+                    }
+                }
+            });
+        })();
     </script>
 </body>
 </html>`;

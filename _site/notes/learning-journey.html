@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Journey - Working Notes</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #e9ecef;
+            --bg-panel: rgba(255, 255, 255, 0.98);
+            --bg-nav: rgba(255, 255, 255, 0.95);
+            --text-primary: #1a1a1a;
+            --text-secondary: #2d3748;
+            --text-muted: #666;
+            --accent-primary: #ff6b35;
+            --accent-secondary: #f7931e;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --shadow-light: rgba(0, 0, 0, 0.02);
+            --shadow-medium: rgba(0, 0, 0, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-panel: rgba(33, 38, 45, 0.98);
+            --bg-nav: rgba(33, 38, 45, 0.95);
+            --text-primary: #f0f6fc;
+            --text-secondary: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent-primary: #ff6b35;
+            --accent-secondary: #f7931e;
+            --border-color: rgba(240, 246, 252, 0.1);
+            --shadow-light: rgba(0, 0, 0, 0.3);
+            --shadow-medium: rgba(0, 0, 0, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Small on-page mode badge */
+        .stack-badge {
+            position: fixed;
+            top: 8px;
+            right: 8px;
+            z-index: 9999;
+            font: 12px/1.2 -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+            color: #111;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 6px;
+            padding: 6px 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            pointer-events: none;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            overflow-x: auto;
+            overflow-y: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .top-nav {
+            background: var(--bg-nav);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 20px;
+            flex-shrink: 0;
+            z-index: 100;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 8px 16px 8px 40px;
+            font-size: 14px;
+            color: var(--text-primary);
+            width: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            width: 250px;
+            box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .site-title {
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .container {
+            display: flex;
+            align-items: stretch;
+            height: calc(100vh - 65px);
+            width: 100%;
+            min-width: 100vw;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            gap: 0;
+        }
+
+        .note-panel {
+            box-sizing: border-box;
+            height: calc(100vh - 65px);
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            position: relative;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 0 20px var(--shadow-light);
+            /* Guarantee side-by-side: fixed flex-basis per panel slot */
+            flex: 0 0 var(--panel-width, 52rem);
+            width: var(--panel-width, 52rem);
+            max-width: 90vw;
+        }
+
+        /* Deterministic widths (desktop). Using rem to guarantee columns even on narrow viewports */
+        .note-panel.panel-1 { --panel-width: 56rem; }
+        .note-panel.panel-2 { --panel-width: 42rem; }
+        .note-panel.panel-3 { --panel-width: 34rem; }
+
+        .note-content {
+            padding: 48px 60px 40px 40px;
+            max-width: 100%;
+            position: relative;
+        }
+
+        /* Collapsed (leftmost) panel shows vertical title only */
+        .note-panel.collapsed {
+            width: 36px;
+            min-width: 36px;
+            max-width: 36px;
+            overflow: hidden;
+            padding: 0;
+            cursor: pointer;
+        }
+        .note-panel.collapsed .note-content {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            padding: 8px 6px;
+        }
+        .note-panel.collapsed .note-body,
+        .note-panel.collapsed .note-meta {
+            display: none;
+        }
+
+        .note-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            color: var(--text-primary);
+            line-height: 1.2;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            padding-right: 60px;
+        }
+
+        .note-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+        }
+
+        .note-body {
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        /* Make embedded media responsive */
+        .note-body img,
+        .note-body video {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 16px 0;
+            border-radius: 8px;
+        }
+
+        .note-body video {
+            width: 100%;
+        }
+
+        .note-body p {
+            margin-bottom: 16px;
+        }
+
+        .note-body h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 32px 0 16px;
+            color: var(--text-primary);
+        }
+
+        .note-body h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 24px 0 12px;
+            color: var(--text-primary);
+        }
+
+        .note-body ul, .note-body ol {
+            margin-bottom: 16px;
+            padding-left: 24px;
+        }
+
+        .note-body li {
+            margin-bottom: 8px;
+        }
+
+        .note-link {
+            color: var(--accent-primary);
+            text-decoration: none;
+            cursor: pointer;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+
+        .note-link:hover {
+            border-bottom-color: var(--accent-primary);
+        }
+
+        .note-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            font-size: 12px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .last-modified {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .intersection-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .intersection-tag {
+            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* Mobile-first responsive design */
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 8px 16px;
+                flex-direction: column;
+                gap: 8px;
+                height: auto;
+            }
+
+            .nav-left, .nav-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .search-input {
+                width: 150px;
+            }
+
+            .search-input:focus {
+                width: 180px;
+            }
+
+            .container {
+                height: calc(100vh - 80px);
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .note-panel { --panel-width: 100vw; width: 100vw; flex-basis: 100vw; }
+            .note-panel.collapsed { display: none; }
+            
+            .note-content {
+                padding: 32px 20px 20px;
+            }
+
+            .note-title {
+                font-size: 24px;
+                padding-right: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <div class="nav-left"><a href="/" class="site-title">Bianca's Mind Garden</a></div>
+        <div class="nav-right">
+            <div class="search-container">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" placeholder="Search notes..." id="searchInput">
+            </div>
+        </div>
+    </div>
+    <!-- Static fallback container (hidden once React mounts) -->
+    <div class="container" id="container">
+        <div class="note-panel panel-1">
+            <div class="note-content">
+                <h1 class="note-title">Learning Journey</h1>
+                <div class="note-body"><p>Welcome to my digital garden of interconnected thoughts and ideas. This is where I explore concepts, build knowledge, and share insights that accumulate over time.</p>
+<p><a href="/notes/here.html" class="note-link" data-note="here">Here</a> you&#39;ll find my collection of evergreen notes - ideas that grow and evolve through connections and iterations. Each note represents a building block in my understanding of the world. Check out my work on <a href="/notes/multipotentiality.html" class="note-link" data-note="multipotentiality">Multipotentiality</a> too</p>
+<h2>What You&#39;ll Find Here</h2>
+<ul>
+<li><strong><a href="/notes/evergreen-notes.html" class="note-link" data-note="evergreen-notes">Evergreen Notes</a></strong>: Ideas that develop and mature over time</li>
+<li><strong><a href="/notes/knowledge-connections.html" class="note-link" data-note="knowledge-connections">Knowledge Connections</a></strong>: Links between concepts across domains</li>
+<li><strong><a href="/notes/personal-insights.html" class="note-link" data-note="personal-insights">Personal Insights</a></strong>: My evolving understanding of various topics</li>
+<li><strong><a href="/notes/learning-journey.html" class="note-link" data-note="learning-journey">Learning Journey</a></strong>: The process of building cumulative knowledge</li>
+</ul>
+</div>
+                
+                <div class="note-meta">
+                    <div class="last-modified"><span>📅</span> Last updated: Sep 17, 2025</div>
+                    
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- React root (disabled) -->
+    <!-- <div id="stack-root" style="display:none"></div> -->
+
+    <script>
+        // Simple search functionality (placeholder)
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            console.log('Searching for:', query);
+        });
+
+        // Multi-panel navigation: open links to the right (max 3 panels)
+        (function() {
+            // Expose a tiny helper to show mode as a badge
+            function setStackBadge(mode){
+                try {
+                    let el = document.getElementById('stack-badge');
+                    if (!el){
+                        el = document.createElement('div');
+                        el.id = 'stack-badge';
+                        el.className = 'stack-badge';
+                        document.body.appendChild(el);
+                    }
+                    el.textContent = 'Stack: ' + mode;
+                } catch {}
+            }
+            try { window.__setStackBadge = setStackBadge; } catch {}
+            const MAX_PANELS = 3;
+            const container = document.getElementById('container');
+            try { if (!window.__STACKED_REACT__) { console.info('[Stack] Mode: Vanilla fallback'); setStackBadge('Vanilla'); } } catch {}
+
+            function getIdFromHref(href) {
+                try {
+                    const u = new URL(href, window.location.origin);
+                    const m = u.pathname.match(//notes/([^/.]+)(?:.html)?$/);
+                    return m ? m[1] : null;
+                } catch { return null; }
+            }
+
+            function updateURLStack(newId, baseIndex) {
+                const url = new URL(window.location.href);
+                const params = url.searchParams;
+                const existing = params.getAll('stackedNotes').filter(Boolean);
+                const start = Number.isFinite(baseIndex) && baseIndex >= 0 ? baseIndex + 1 : existing.length;
+                const trimmedBase = existing.slice(0, start);
+                if (newId) trimmedBase.push(newId);
+                // Limit to last 3 ids in URL
+                const trimmed = trimmedBase.slice(-3);
+                params.delete('stackedNotes');
+                trimmed.forEach(id => params.append('stackedNotes', id));
+                history.pushState({ stackedNotes: trimmed }, '', url);
+            }
+
+            async function openNote(url, { pushState = true, baseIndex = null } = {}) {
+                try {
+                    // Ensure .html for fetch
+                    let fetchUrl = url;
+                    if (!/.html($|?)/.test(fetchUrl)) fetchUrl = url.replace(/(/notes/[^/?#]+)(.*)$/, '$1.html$2');
+                    const res = await fetch(fetchUrl, { credentials: 'same-origin' });
+                    if (!res.ok) throw new Error('Failed to load note: ' + url);
+                    const html = await res.text();
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    const titleEl = doc.querySelector('.note-title');
+                    const bodyEl = doc.querySelector('.note-body');
+                    const title = titleEl ? titleEl.textContent : 'Note';
+                    const body = bodyEl ? bodyEl.innerHTML : '<p>Content unavailable.</p>';
+
+                    const panel = document.createElement('div');
+                    panel.className = 'note-panel';
+                    panel.innerHTML = '<div class="note-content">'
+                      + '<h1 class="note-title">' + title + '</h1>'
+                      + '<div class="note-body">' + body + '</div>'
+                      + '</div>';
+
+                    // Manage collapsed left strip + up to 3 full panels
+                    const panels = Array.from(container.querySelectorAll('.note-panel'));
+                    const fullPanels = panels.filter(p => !p.classList.contains('collapsed'));
+                    if (fullPanels.length >= MAX_PANELS) {
+                        const first = panels[0];
+                        if (first && !first.classList.contains('collapsed')) {
+                            first.classList.add('collapsed');
+                        } else if (first && first.classList.contains('collapsed')) {
+                            // Already collapsed; drop it to keep only one collapsed strip
+                            container.removeChild(first);
+                        }
+                    }
+                    container.appendChild(panel);
+                    relabelPanels();
+                    // Scroll so two full panels are visible and third partially
+                    const vw = container.clientWidth || window.innerWidth;
+                    container.scrollLeft = Math.max(0, container.scrollWidth - vw * 0.8);
+
+                    if (pushState) {
+                        const id = getIdFromHref(url);
+                        if (id) updateURLStack(id, baseIndex);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    window.location.href = url; // fallback to navigation
+                }
+            }
+
+            document.addEventListener('click', function(e) {
+                // If React app is mounted, let it handle stacking
+                if (window && window.__STACKED_REACT__) return;
+                // Click-to-expand for collapsed left strip (first column)
+                const collapsedPanel = e.target.closest && e.target.closest('.note-panel.collapsed');
+                if (collapsedPanel) {
+                    // Expand the collapsed panel and, if we now exceed MAX_PANELS full panels,
+                    // collapse the next panel to the right to keep the history strip.
+                    collapsedPanel.classList.remove('collapsed');
+                    const panelsAll = Array.from(container.querySelectorAll('.note-panel'));
+                    const fullAfter = panelsAll.filter(p => !p.classList.contains('collapsed'));
+                    if (fullAfter.length > MAX_PANELS) {
+                        // Collapse the next panel to the right (index 1), if present
+                        const next = panelsAll[1];
+                        if (next) next.classList.add('collapsed');
+                    }
+                    relabelPanels();
+                    // Bring expanded panel into view on the left
+                    container.scrollLeft = Math.max(0, container.scrollLeft - 200);
+                    e.preventDefault();
+                    return;
+                }
+                // Intercept internal note links broadly: data-note, .note-link, or href starts with /notes/
+                const link = (e.target.closest && (e.target.closest('a[data-note], a.note-link, a[href^="/notes/"]')));
+                if (!link) return;
+                const panelEl = e.target.closest('.note-panel');
+                if (!panelEl) return;
+                e.preventDefault();
+                const href = link.getAttribute('href');
+                if (!(href && href.startsWith('/notes/'))) {
+                    if (href) window.location.href = href;
+                    return;
+                }
+                // Determine which panel the click came from and truncate to that point
+                const panels = Array.from(container.querySelectorAll('.note-panel'));
+                const fullPanels = panels.filter(p => !p.classList.contains('collapsed'));
+                const clickedIndexAll = panels.indexOf(panelEl);
+                const clickedIndexFull = fullPanels.indexOf(panelEl);
+                // Remove panels to the right of the clicked one
+                for (let i = panels.length - 1; i > clickedIndexAll; i--) {
+                    container.removeChild(panels[i]);
+                }
+                // Open the next note as a new panel to the right
+                try { console.info('[Stack] openNote (vanilla):', href); } catch {}
+                openNote(href, { pushState: true, baseIndex: clickedIndexFull });
+            });
+
+            // Restore stacked notes from URL on load
+            window.addEventListener('DOMContentLoaded', () => {
+                if (window && window.__STACKED_REACT__) return; // React will restore
+                try {
+                    const params = new URL(window.location.href).searchParams;
+                    const ids = params.getAll('stackedNotes');
+                    ids.forEach(id => openNote('/notes/' + id + '.html', { pushState: false }));
+                } catch (e) { console.warn('Restore stack failed', e); }
+                // Ensure the initial pre-rendered panel gets labeled for widths
+                try { relabelPanels(); } catch {}
+            });
+            function relabelPanels() {
+                const panels = Array.from(container.querySelectorAll('.note-panel'));
+                panels.forEach(p => p.classList.remove('panel-1','panel-2','panel-3'));
+                const fullPanels = panels.filter(p => !p.classList.contains('collapsed'));
+                const lastThree = fullPanels.slice(-3);
+                if (lastThree.length === 3) {
+                    lastThree[0].classList.add('panel-1');
+                    lastThree[1].classList.add('panel-2');
+                    lastThree[2].classList.add('panel-3');
+                } else if (lastThree.length === 2) {
+                    lastThree[0].classList.add('panel-1');
+                    lastThree[1].classList.add('panel-2');
+                } else if (lastThree.length === 1) {
+                    lastThree[0].classList.add('panel-1');
+                }
+            }
+        })();
+    </script>
+
+    <!-- React app disabled: using vanilla stacker for reliability -->
+</body>
+</html>

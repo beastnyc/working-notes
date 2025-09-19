@@ -1,16 +1,39 @@
 {
   "notes": [
     {
-      "id": "multipotentiality",
-      "title": "Multipotentiality",
-      "lastModified": "2025-08-16",
+      "id": "evergreen-notes",
+      "title": "Evergreen Notes",
+      "lastModified": "2025-09-18T00:00:00.000Z",
       "tags": [],
-      "url": "/notes/multipotentiality.html"
+      "url": "/notes/evergreen-notes.html"
+    },
+    {
+      "id": "index",
+      "title": "Hey there!",
+      "lastModified": "2025-09-18T00:00:00.000Z",
+      "tags": [
+        "digital-garden"
+      ],
+      "url": "/notes/index.html"
+    },
+    {
+      "id": "ipad-as-a-tool",
+      "title": "Ipad as a Tool",
+      "lastModified": "2025-09-18T00:00:00.000Z",
+      "tags": [],
+      "url": "/notes/ipad-as-a-tool.html"
+    },
+    {
+      "id": "knowledge-connections",
+      "title": "Knowledge Connections",
+      "lastModified": "2025-09-18T00:00:00.000Z",
+      "tags": [],
+      "url": "/notes/knowledge-connections.html"
     },
     {
       "id": "knowledge-work",
       "title": "Knowledge work",
-      "lastModified": "2025-08-15",
+      "lastModified": "2025-09-18T00:00:00.000Z",
       "tags": [
         "productivity",
         "learning",
@@ -19,25 +42,25 @@
       "url": "/notes/knowledge-work.html"
     },
     {
-      "id": "index",
-      "title": "Welcome to My Working Notes",
-      "lastModified": "2025-01-27",
-      "tags": [
-        "homepage",
-        "digital-garden"
-      ],
-      "url": "/notes/index.html"
+      "id": "learning-journey",
+      "title": "Learning Journey",
+      "lastModified": "2025-09-18T00:00:00.000Z",
+      "tags": [],
+      "url": "/notes/learning-journey.html"
     },
     {
-      "id": "evergreen-notes",
-      "title": "Evergreen notes",
-      "lastModified": "2024-01-15",
-      "tags": [
-        "knowledge-work",
-        "note-taking",
-        "evergreen"
-      ],
-      "url": "/notes/evergreen-notes.html"
+      "id": "personal-insights",
+      "title": "Personal Insights",
+      "lastModified": "2025-09-18T00:00:00.000Z",
+      "tags": [],
+      "url": "/notes/personal-insights.html"
+    },
+    {
+      "id": "multipotentiality",
+      "title": "Multipotentiality",
+      "lastModified": "2025-08-16T00:00:00.000Z",
+      "tags": [],
+      "url": "/notes/multipotentiality.html"
     }
   ]
 }

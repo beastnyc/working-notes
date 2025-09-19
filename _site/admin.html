@@ -831,6 +831,7 @@ Use [note-id] to link to other notes in your system."></textarea>
         function updateLivePreview() {
             const content = document.getElementById('splitEditor').value;
             const htmlContent = convertMarkdownToHTML(content);
+            // Note: Using innerHTML here for markdown rendering - content should be trusted
             document.getElementById('livePreview').innerHTML = htmlContent;
         }
 

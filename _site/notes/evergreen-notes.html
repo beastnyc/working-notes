@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evergreen notes - Working Notes</title>
+    <title>Evergreen Notes - Working Notes</title>
     <link rel="stylesheet" href="/assets/css/style.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -42,6 +42,22 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        /* Small on-page mode badge */
+        .stack-badge {
+            position: fixed;
+            top: 8px;
+            right: 8px;
+            z-index: 9999;
+            font: 12px/1.2 -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+            color: #111;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 6px;
+            padding: 6px 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            pointer-events: none;
         }
 
         body {
@@ -113,45 +129,68 @@
             font-size: 14px;
         }
 
-        .home-link {
+        .site-title {
             color: var(--text-primary);
-            text-decoration: none;
-            font-size: 15px;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .home-link:hover {
-            color: var(--accent-primary);
-            transform: translateY(-1px);
+            letter-spacing: 0.6px;
         }
 
         .container {
             display: flex;
+            align-items: stretch;
             height: calc(100vh - 65px);
-            width: fit-content;
+            width: 100%;
             min-width: 100vw;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            gap: 0;
         }
 
         .note-panel {
+            box-sizing: border-box;
             height: calc(100vh - 65px);
             background: var(--bg-panel);
             border-right: 1px solid var(--border-color);
-            flex-shrink: 0;
             overflow-y: auto;
             position: relative;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 0 0 20px var(--shadow-light);
-            width: 600px;
+            /* Guarantee side-by-side: fixed flex-basis per panel slot */
+            flex: 0 0 var(--panel-width, 52rem);
+            width: var(--panel-width, 52rem);
+            max-width: 90vw;
         }
+
+        /* Deterministic widths (desktop). Using rem to guarantee columns even on narrow viewports */
+        .note-panel.panel-1 { --panel-width: 56rem; }
+        .note-panel.panel-2 { --panel-width: 42rem; }
+        .note-panel.panel-3 { --panel-width: 34rem; }
 
         .note-content {
             padding: 48px 60px 40px 40px;
             max-width: 100%;
             position: relative;
+        }
+
+        /* Collapsed (leftmost) panel shows vertical title only */
+        .note-panel.collapsed {
+            width: 36px;
+            min-width: 36px;
+            max-width: 36px;
+            overflow: hidden;
+            padding: 0;
+            cursor: pointer;
+        }
+        .note-panel.collapsed .note-content {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            padding: 8px 6px;
+        }
+        .note-panel.collapsed .note-body,
+        .note-panel.collapsed .note-meta {
+            display: none;
         }
 
         .note-title {
@@ -179,6 +218,20 @@
         .note-body {
             font-size: 16px;
             line-height: 1.7;
+        }
+
+        /* Make embedded media responsive */
+        .note-body img,
+        .note-body video {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 16px 0;
+            border-radius: 8px;
+        }
+
+        .note-body video {
+            width: 100%;
         }
 
         .note-body p {
@@ -284,10 +337,8 @@
                 -webkit-overflow-scrolling: touch;
             }
 
-            .note-panel {
-                width: 100vw;
-                min-width: 100vw;
-            }
+            .note-panel { --panel-width: 100vw; width: 100vw; flex-basis: 100vw; }
+            .note-panel.collapsed { display: none; }
             
             .note-content {
                 padding: 32px 20px 20px;
@@ -302,9 +353,7 @@
 </head>
 <body>
     <div class="top-nav">
-        <div class="nav-left">
-            <a href="/" class="home-link">← MULTIPOTENTIAL MIND</a>
-        </div>
+        <div class="nav-left"><a href="/" class="site-title">Bianca's Mind Garden</a></div>
         <div class="nav-right">
             <div class="search-container">
                 <span class="search-icon">🔍</span>
@@ -312,35 +361,16 @@
             </div>
         </div>
     </div>
+    <!-- Static fallback container (hidden once React mounts) -->
     <div class="container" id="container">
-        <div class="note-panel active">
+        <div class="note-panel panel-1">
             <div class="note-content">
-                <h1 class="note-title">Evergreen notes</h1>
-                <div class="note-body">
-                    <p>Evergreen notes are written and organized to accumulate over time. Unlike most notes apps, the goal here isn&#39;t to collect information: it&#39;s to develop insights.</p>
-<p>Most people take only transient notes. That is, they write temporary reminders and scratch thoughts that they&#39;ll use once then abandon. But <a href="/notes/knowledge-work" class="note-link">Knowledge Work</a> can be much more effective when we accumulate insights over time.</p>
-<h2 id="properties-of-evergreen-notes">Properties of evergreen notes</h2>
-<p>Effective evergreen notes share several properties:</p>
-<ul>
-<li><strong>Atomic:</strong> Each note should be about one thing. This makes them easier to link and helps avoid orphaned ideas.</li>
-<li><strong>Concept-oriented:</strong> Notes should be organized around concepts, not projects, people, or sources.</li>
-<li><strong>Densely linked:</strong> The real insight comes from the connections between ideas.</li>
-<li><strong>Own words:</strong> Writing in your own words forces you to really understand the concept.</li>
-</ul>
-<p>The term &quot;evergreen&quot; comes from the idea that these notes, like evergreen trees, remain useful and &quot;alive&quot; throughout the seasons.</p>
-<h2 id="see-also">See also</h2>
-<p><a href="/notes/spaced-repetition" class="note-link">spaced-repetition</a> systems use similar principles of iterative refinement.<br><a href="/notes/process-over-product" class="note-link">process-over-product</a> mindset supports iterative note development. </p>
-
-                </div>
+                <h1 class="note-title">Evergreen Notes</h1>
+                <div class="note-body"><p>I really love evergreen notes. But I think of them as <a href="/notes/ipad-as-a-tool.html" class="note-link" data-note="ipad-as-a-tool">Ipad as a tool</a></p>
+</div>
                 
                 <div class="note-meta">
-                    <div class="last-modified">
-                        <span>📅</span> 2024-01-15
-                    </div>
-                    
-                    <div class="intersection-tags">
-                        <span class="intersection-tag">knowledge-work</span><span class="intersection-tag">note-taking</span><span class="intersection-tag">evergreen</span>
-                    </div>
+                    <div class="last-modified"><span>📅</span> Last updated: Sep 17, 2025</div>
                     
                 </div>
                 
@@ -348,23 +378,184 @@
         </div>
     </div>
 
+    <!-- React root (disabled) -->
+    <!-- <div id="stack-root" style="display:none"></div> -->
+
     <script>
-        // Simple search functionality
+        // Simple search functionality (placeholder)
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const query = e.target.value.toLowerCase();
             console.log('Searching for:', query);
         });
 
-        // Handle note links
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('note-link')) {
-                e.preventDefault();
-                const href = e.target.getAttribute('href');
-                if (href && href.startsWith('/')) {
-                    window.location.href = href;
+        // Multi-panel navigation: open links to the right (max 3 panels)
+        (function() {
+            // Expose a tiny helper to show mode as a badge
+            function setStackBadge(mode){
+                try {
+                    let el = document.getElementById('stack-badge');
+                    if (!el){
+                        el = document.createElement('div');
+                        el.id = 'stack-badge';
+                        el.className = 'stack-badge';
+                        document.body.appendChild(el);
+                    }
+                    el.textContent = 'Stack: ' + mode;
+                } catch {}
+            }
+            try { window.__setStackBadge = setStackBadge; } catch {}
+            const MAX_PANELS = 3;
+            const container = document.getElementById('container');
+            try { if (!window.__STACKED_REACT__) { console.info('[Stack] Mode: Vanilla fallback'); setStackBadge('Vanilla'); } } catch {}
+
+            function getIdFromHref(href) {
+                try {
+                    const u = new URL(href, window.location.origin);
+                    const m = u.pathname.match(//notes/([^/.]+)(?:.html)?$/);
+                    return m ? m[1] : null;
+                } catch { return null; }
+            }
+
+            function updateURLStack(newId, baseIndex) {
+                const url = new URL(window.location.href);
+                const params = url.searchParams;
+                const existing = params.getAll('stackedNotes').filter(Boolean);
+                const start = Number.isFinite(baseIndex) && baseIndex >= 0 ? baseIndex + 1 : existing.length;
+                const trimmedBase = existing.slice(0, start);
+                if (newId) trimmedBase.push(newId);
+                // Limit to last 3 ids in URL
+                const trimmed = trimmedBase.slice(-3);
+                params.delete('stackedNotes');
+                trimmed.forEach(id => params.append('stackedNotes', id));
+                history.pushState({ stackedNotes: trimmed }, '', url);
+            }
+
+            async function openNote(url, { pushState = true, baseIndex = null } = {}) {
+                try {
+                    // Ensure .html for fetch
+                    let fetchUrl = url;
+                    if (!/.html($|?)/.test(fetchUrl)) fetchUrl = url.replace(/(/notes/[^/?#]+)(.*)$/, '$1.html$2');
+                    const res = await fetch(fetchUrl, { credentials: 'same-origin' });
+                    if (!res.ok) throw new Error('Failed to load note: ' + url);
+                    const html = await res.text();
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    const titleEl = doc.querySelector('.note-title');
+                    const bodyEl = doc.querySelector('.note-body');
+                    const title = titleEl ? titleEl.textContent : 'Note';
+                    const body = bodyEl ? bodyEl.innerHTML : '<p>Content unavailable.</p>';
+
+                    const panel = document.createElement('div');
+                    panel.className = 'note-panel';
+                    panel.innerHTML = '<div class="note-content">'
+                      + '<h1 class="note-title">' + title + '</h1>'
+                      + '<div class="note-body">' + body + '</div>'
+                      + '</div>';
+
+                    // Manage collapsed left strip + up to 3 full panels
+                    const panels = Array.from(container.querySelectorAll('.note-panel'));
+                    const fullPanels = panels.filter(p => !p.classList.contains('collapsed'));
+                    if (fullPanels.length >= MAX_PANELS) {
+                        const first = panels[0];
+                        if (first && !first.classList.contains('collapsed')) {
+                            first.classList.add('collapsed');
+                        } else if (first && first.classList.contains('collapsed')) {
+                            // Already collapsed; drop it to keep only one collapsed strip
+                            container.removeChild(first);
+                        }
+                    }
+                    container.appendChild(panel);
+                    relabelPanels();
+                    // Scroll so two full panels are visible and third partially
+                    const vw = container.clientWidth || window.innerWidth;
+                    container.scrollLeft = Math.max(0, container.scrollWidth - vw * 0.8);
+
+                    if (pushState) {
+                        const id = getIdFromHref(url);
+                        if (id) updateURLStack(id, baseIndex);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    window.location.href = url; // fallback to navigation
                 }
             }
-        });
+
+            document.addEventListener('click', function(e) {
+                // If React app is mounted, let it handle stacking
+                if (window && window.__STACKED_REACT__) return;
+                // Click-to-expand for collapsed left strip (first column)
+                const collapsedPanel = e.target.closest && e.target.closest('.note-panel.collapsed');
+                if (collapsedPanel) {
+                    // Expand the collapsed panel and, if we now exceed MAX_PANELS full panels,
+                    // collapse the next panel to the right to keep the history strip.
+                    collapsedPanel.classList.remove('collapsed');
+                    const panelsAll = Array.from(container.querySelectorAll('.note-panel'));
+                    const fullAfter = panelsAll.filter(p => !p.classList.contains('collapsed'));
+                    if (fullAfter.length > MAX_PANELS) {
+                        // Collapse the next panel to the right (index 1), if present
+                        const next = panelsAll[1];
+                        if (next) next.classList.add('collapsed');
+                    }
+                    relabelPanels();
+                    // Bring expanded panel into view on the left
+                    container.scrollLeft = Math.max(0, container.scrollLeft - 200);
+                    e.preventDefault();
+                    return;
+                }
+                // Intercept internal note links broadly: data-note, .note-link, or href starts with /notes/
+                const link = (e.target.closest && (e.target.closest('a[data-note], a.note-link, a[href^="/notes/"]')));
+                if (!link) return;
+                const panelEl = e.target.closest('.note-panel');
+                if (!panelEl) return;
+                e.preventDefault();
+                const href = link.getAttribute('href');
+                if (!(href && href.startsWith('/notes/'))) {
+                    if (href) window.location.href = href;
+                    return;
+                }
+                // Determine which panel the click came from and truncate to that point
+                const panels = Array.from(container.querySelectorAll('.note-panel'));
+                const fullPanels = panels.filter(p => !p.classList.contains('collapsed'));
+                const clickedIndexAll = panels.indexOf(panelEl);
+                const clickedIndexFull = fullPanels.indexOf(panelEl);
+                // Remove panels to the right of the clicked one
+                for (let i = panels.length - 1; i > clickedIndexAll; i--) {
+                    container.removeChild(panels[i]);
+                }
+                // Open the next note as a new panel to the right
+                try { console.info('[Stack] openNote (vanilla):', href); } catch {}
+                openNote(href, { pushState: true, baseIndex: clickedIndexFull });
+            });
+
+            // Restore stacked notes from URL on load
+            window.addEventListener('DOMContentLoaded', () => {
+                if (window && window.__STACKED_REACT__) return; // React will restore
+                try {
+                    const params = new URL(window.location.href).searchParams;
+                    const ids = params.getAll('stackedNotes');
+                    ids.forEach(id => openNote('/notes/' + id + '.html', { pushState: false }));
+                } catch (e) { console.warn('Restore stack failed', e); }
+                // Ensure the initial pre-rendered panel gets labeled for widths
+                try { relabelPanels(); } catch {}
+            });
+            function relabelPanels() {
+                const panels = Array.from(container.querySelectorAll('.note-panel'));
+                panels.forEach(p => p.classList.remove('panel-1','panel-2','panel-3'));
+                const fullPanels = panels.filter(p => !p.classList.contains('collapsed'));
+                const lastThree = fullPanels.slice(-3);
+                if (lastThree.length === 3) {
+                    lastThree[0].classList.add('panel-1');
+                    lastThree[1].classList.add('panel-2');
+                    lastThree[2].classList.add('panel-3');
+                } else if (lastThree.length === 2) {
+                    lastThree[0].classList.add('panel-1');
+                    lastThree[1].classList.add('panel-2');
+                } else if (lastThree.length === 1) {
+                    lastThree[0].classList.add('panel-1');
+                }
+            }
+        })();
     </script>
+
+    <!-- React app disabled: using vanilla stacker for reliability -->
 </body>
 </html>

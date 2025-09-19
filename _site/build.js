@@ -493,12 +493,10 @@ function buildSite() {
 
                     const panel = document.createElement('div');
                     panel.className = 'note-panel';
-                    panel.innerHTML = `
-                        <div class="note-content">
-                            <h1 class="note-title">${title}</h1>
-                            <div class="note-body">${body}</div>
-                        </div>
-                    `;
+                    panel.innerHTML = '<div class="note-content">'
+                      + '<h1 class="note-title">' + title + '</h1>'
+                      + '<div class="note-body">' + body + '</div>'
+                      + '</div>';
 
                     // Limit to MAX_PANELS by removing from the left if needed
                     const panels = container.querySelectorAll('.note-panel');

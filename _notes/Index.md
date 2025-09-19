@@ -1,6 +1,6 @@
 ---
 layout: homepage
-title: Welcome to My Working Notes
+title: Hey there!
 description: A collection of interconnected thoughts and ideas
 last_modified: 2025-09-18
 tags:

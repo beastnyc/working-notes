@@ -1,6 +1,6 @@
 ---
 layout: note
-title: Multipotentiality
+title:
 tags:
 created: "2025-08-15 "
 last_modified: 2025-09-18

@@ -507,8 +507,8 @@ function buildSite() {
         </div>
     </div>
 
-    <!-- React root (disabled) -->
-    <!-- <div id="stack-root" style="display:none"></div> -->
+    <!-- React root for note stacking -->
+    <div id="stack-root" style="display:none"></div>
 
     <script>
         // Simple search functionality (placeholder)
@@ -685,7 +685,8 @@ function buildSite() {
         })();
     </script>
 
-    <!-- React app disabled: using vanilla stacker for reliability -->
+    <!-- React app for enhanced note stacking -->
+    <script type="module" src="/assets/main.js"></script>
 </body>
 </html>`;
       

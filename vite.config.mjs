@@ -9,6 +9,7 @@ export default defineConfig({
     emptyOutDir: false, // keep generated HTML from builder
     assetsDir: 'assets',
     rollupOptions: {
+      input: 'src/main.jsx',
       output: {
         entryFileNames: 'assets/main.js',
         chunkFileNames: 'assets/[name].js',

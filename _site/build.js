@@ -66,6 +66,15 @@ function convertWikiLinks(text) {
   });
 }
 
+// Format a date string like 2025-09-18 to "Sep 18, 2025"
+function formatDate(s) {
+  try {
+    const d = new Date(s);
+    if (isNaN(d.getTime())) return s;
+    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch { return s; }
+}
+
 // Build the site
 function buildSite() {
   console.log('🔨 Building Working Notes site...');
@@ -232,20 +241,12 @@ function buildSite() {
             font-size: 14px;
         }
 
-        .home-link {
+        .site-title {
             color: var(--text-primary);
-            text-decoration: none;
-            font-size: 15px;
-            font-weight: 600;
+            font-size: 16px;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .home-link:hover {
-            color: var(--accent-primary);
-            transform: translateY(-1px);
+            letter-spacing: 0.6px;
         }
 
         .container {
@@ -457,9 +458,7 @@ function buildSite() {
 </head>
 <body>
     <div class="top-nav">
-        <div class="nav-left">
-            <a href="/" class="home-link">← MULTIPOTENTIAL MIND</a>
-        </div>
+        <div class="nav-left"><div class="site-title">Bianca's Mind Garden</div></div>
         <div class="nav-right">
             <div class="search-container">
                 <span class="search-icon">🔍</span>
@@ -477,7 +476,7 @@ function buildSite() {
                 ${attributes.last_modified ? `
                 <div class="note-meta">
                     <div class="last-modified">
-                        <span>📅</span> ${attributes.last_modified}
+                        <span>📅</span> Last updated: ${formatDate(attributes.last_modified)}
                     </div>
                     ${attributes.tags ? `
                     <div class="intersection-tags">

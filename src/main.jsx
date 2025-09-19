@@ -13,6 +13,7 @@ function boot() {
     const cont = document.getElementById('container');
     if (cont) cont.style.display = 'none';
     rootEl.style.display = 'block';
+    console.info('[Stack] Mode: React');
   } catch {}
   createRoot(rootEl).render(
     React.createElement(StackedApp, { initial: { title, body } })

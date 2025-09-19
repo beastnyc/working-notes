@@ -501,6 +501,7 @@ function buildSite() {
         (function() {
             const MAX_PANELS = 3;
             const container = document.getElementById('container');
+            try { if (!window.__STACKED_REACT__) console.info('[Stack] Mode: Vanilla fallback'); } catch {}
 
             function getIdFromHref(href) {
                 try {

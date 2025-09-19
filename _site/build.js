@@ -507,8 +507,8 @@ function buildSite() {
         </div>
     </div>
 
-    <!-- React root -->
-    <div id="stack-root" style="display:none"></div>
+    <!-- React root (disabled) -->
+    <!-- <div id="stack-root" style="display:none"></div> -->
 
     <script>
         // Simple search functionality (placeholder)
@@ -685,8 +685,7 @@ function buildSite() {
         })();
     </script>
 
-    <!-- Vite React app -->
-    <script type="module" src="/assets/main.js"></script>
+    <!-- React app disabled: using vanilla stacker for reliability -->
 </body>
 </html>`;
       

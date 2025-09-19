@@ -1,14 +1,15 @@
 ---
-layout: homepage
+layout: note
 title: Hey there!
 description: A collection of interconnected thoughts and ideas
 last_modified: 2025-09-18
 tags:
-  - homepage
   - digital-garden
 created: 2025-08-14
-last: "2025-09-17 "
 ---
+
+
+
 ![[gloomy-girl.png]]
 
 Welcome to my digital garden of interconnected thoughts and ideas. This is where I explore concepts, build knowledge, and share insights that accumulate over time.

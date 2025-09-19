@@ -1,6 +1,6 @@
 ---
 layout: note
-title:
+title: Ipad as a Tool
 tags:
 last_modified: 2025-09-18
 ---

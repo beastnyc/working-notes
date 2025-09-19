@@ -468,28 +468,30 @@ function buildSite() {
             </div>
         </div>
     </div>
+    <!-- Static fallback container (hidden once React mounts) -->
     <div class="container" id="container">
-        <div class="note-panel active">
+        <div class="note-panel panel-1">
             <div class="note-content">
                 <h1 class="note-title">${attributes.title || 'Note'}</h1>
-                <div class="note-body">
-                    ${htmlContent}
-                </div>
+                <div class="note-body">${htmlContent}</div>
                 ${attributes.last_modified ? `
                 <div class="note-meta">
-                    <div class="last-modified">
-                        <span>📅</span> Last updated: ${formatDate(attributes.last_modified)}
-                    </div>
+                    <div class="last-modified"><span>📅</span> Last updated: ${formatDate(attributes.last_modified)}</div>
                     ${attributes.tags ? `
-                    <div class="intersection-tags">
-                        ${attributes.tags.map(tag => `<span class="intersection-tag">${tag}</span>`).join('')}
-                    </div>
+                    <div class="intersection-tags">${attributes.tags.map(tag => `<span class=\"intersection-tag\">${tag}</span>`).join('')}</div>
                     ` : ''}
                 </div>
                 ` : ''}
             </div>
         </div>
     </div>
+
+    <!-- React root -->
+    <div id="stack-root" style="display:none"></div>
+
+    <!-- React via CDN (no bundler) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
     <script>
         // Simple search functionality (placeholder)
@@ -625,6 +627,104 @@ function buildSite() {
                 }
             }
         })();
+    </script>
+
+    <!-- React Stacked Notes App -->
+    <script>
+      (function(){
+        const e = React.createElement;
+
+        function getIdFromHref(href){
+          const m = href && href.match(/\/notes\/([^/.]+)(?:\.html)?/);
+          return m ? m[1] : null;
+        }
+
+        function Panel({title, body, index}){
+          const cls = 'note-panel ' + (index===0?'panel-1':index===1?'panel-2':'panel-3');
+          return e('div', {className: cls},
+            e('div', {className:'note-content'},
+              e('h1', {className:'note-title'}, title || 'Note'),
+              e('div', {className:'note-body', dangerouslySetInnerHTML:{__html: body}})
+            )
+          );
+        }
+
+        function StackedApp({initial}){
+          const [panels, setPanels] = React.useState([initial]);
+          const ref = React.useRef(null);
+
+          React.useEffect(()=>{
+            // hide static fallback, show React root
+            const cont = document.getElementById('container');
+            if (cont) cont.style.display='none';
+            const root = document.getElementById('stack-root');
+            if (root) root.style.display='block';
+          },[]);
+
+          React.useEffect(()=>{
+            if (!ref.current) return;
+            const vw = ref.current.clientWidth || window.innerWidth;
+            ref.current.scrollLeft = Math.max(0, ref.current.scrollWidth - vw*0.8);
+          },[panels.length]);
+
+          async function openNote(href, baseIndex){
+            try{
+              let fetchUrl = href;
+              if (!/\.html($|\?)/.test(fetchUrl)) fetchUrl = href.replace(/(\/notes\/[^/?#]+)(.*)$/, '$1.html$2');
+              const res = await fetch(fetchUrl, {credentials:'same-origin'});
+              if (!res.ok) throw new Error('Failed to load '+fetchUrl);
+              const html = await res.text();
+              const doc = new DOMParser().parseFromString(html,'text/html');
+              const title = (doc.querySelector('.note-title')||{}).textContent || 'Note';
+              const body = (doc.querySelector('.note-body')||{}).innerHTML || '<p>Content unavailable.</p>';
+              setPanels((prev)=>{
+                const next = baseIndex!=null ? prev.slice(0, baseIndex+1) : prev.slice();
+                next.push({title, body});
+                return next.slice(-MAX_PANELS);
+              });
+              const id = getIdFromHref(href);
+              if (id){
+                const url = new URL(window.location.href);
+                const params = url.searchParams;
+                const existing = params.getAll('stackedNotes').filter(Boolean);
+                const start = Number.isFinite(baseIndex) && baseIndex>=0 ? baseIndex+1 : existing.length;
+                const trimmed = existing.slice(0,start);
+                trimmed.push(id);
+                const final = trimmed.slice(-MAX_PANELS);
+                params.delete('stackedNotes');
+                final.forEach(x=>params.append('stackedNotes',x));
+                history.pushState({stackedNotes:final},'',url);
+              }
+            }catch(err){ console.error(err); window.location.href = href; }
+          }
+
+          // delegate clicks within panels
+          function onClick(e){
+            const link = e.target.closest && e.target.closest('.note-link');
+            if (!link) return;
+            const href = link.getAttribute('href');
+            if (!(href && href.startsWith('/notes/'))) return;
+            e.preventDefault();
+            const panelEl = e.target.closest('.note-panel');
+            const idx = Array.from(ref.current.querySelectorAll('.note-panel')).indexOf(panelEl);
+            openNote(href, idx);
+          }
+
+          return e('div', {id:'stack', className:'container', ref, onClick},
+            panels.map((p,i)=> e(Panel, {key:i, title:p.title, body:p.body, index:i}))
+          );
+        }
+
+        // Boot
+        window.addEventListener('DOMContentLoaded', ()=>{
+          const rootEl = document.getElementById('stack-root');
+          if (!rootEl) return;
+          // seed from server-rendered first panel
+          const title = (document.querySelector('.note-title')||{}).textContent || 'Note';
+          const body = (document.querySelector('.note-body')||{}).innerHTML || '';
+          ReactDOM.createRoot(rootEl).render(e(StackedApp, {initial:{title, body}}));
+        });
+      })();
     </script>
 </body>
 </html>`;

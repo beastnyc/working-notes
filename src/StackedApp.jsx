@@ -5,10 +5,25 @@ function getIdFromHref(href) {
   return m ? m[1] : null;
 }
 
-function Panel({ title, body, index }) {
-  const cls = 'note-panel ' + (index === 0 ? 'panel-1' : index === 1 ? 'panel-2' : 'panel-3');
+function Panel({ title, body, index, isCollapsed, onClick }) {
+  const panelRef = React.useRef(null);
+
+  if (isCollapsed) {
+    return (
+      <div
+        className="note-panel collapsed"
+        onClick={onClick}
+        style={{ cursor: 'pointer' }}
+      >
+        <div className="collapsed-title">
+          {title || 'Note'}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={cls}>
+    <div className="note-panel" ref={panelRef}>
       <div className="note-content">
         <h1 className="note-title">{title || 'Note'}</h1>
         <div className="note-body" dangerouslySetInnerHTML={{ __html: body }} />
@@ -17,9 +32,9 @@ function Panel({ title, body, index }) {
   );
 }
 
-export default function StackedApp({ initial, maxPanels = 3 }) {
+export default function StackedApp({ initial, maxVisiblePanes = 3 }) {
   const [panels, setPanels] = React.useState([initial]);
-  const ref = React.useRef(null);
+  const containerRef = React.useRef(null);
 
   React.useEffect(() => {
     const cont = document.getElementById('container');
@@ -28,10 +43,22 @@ export default function StackedApp({ initial, maxPanels = 3 }) {
     if (root) root.style.display = 'block';
   }, []);
 
+  // Scroll to show the newest pane when a new one is added
   React.useEffect(() => {
-    if (!ref.current) return;
-    const vw = ref.current.clientWidth || window.innerWidth;
-    ref.current.scrollLeft = Math.max(0, ref.current.scrollWidth - vw * 0.8);
+    if (!containerRef.current) return;
+    const container = containerRef.current;
+
+    // Smooth scroll to the end to show newest pane
+    setTimeout(() => {
+      const lastPane = container.querySelector('.note-panel:last-child:not(.collapsed)');
+      if (lastPane) {
+        lastPane.scrollIntoView({
+          behavior: 'smooth',
+          inline: 'end',
+          block: 'nearest'
+        });
+      }
+    }, 100);
   }, [panels.length]);
 
   async function openNote(href, baseIndex) {
@@ -44,11 +71,13 @@ export default function StackedApp({ initial, maxPanels = 3 }) {
       const doc = new DOMParser().parseFromString(html, 'text/html');
       const title = (doc.querySelector('.note-title') || {}).textContent || 'Note';
       const body = (doc.querySelector('.note-body') || {}).innerHTML || '<p>Content unavailable.</p>';
+
       setPanels((prev) => {
         const next = baseIndex != null ? prev.slice(0, baseIndex + 1) : prev.slice();
         next.push({ title, body });
-        return next.slice(-maxPanels);
+        return next; // Keep all panels, we'll handle collapsing in render
       });
+
       const id = getIdFromHref(href);
       if (id) {
         const url = new URL(window.location.href);
@@ -57,15 +86,23 @@ export default function StackedApp({ initial, maxPanels = 3 }) {
         const start = Number.isFinite(baseIndex) && baseIndex >= 0 ? baseIndex + 1 : existing.length;
         const trimmed = existing.slice(0, start);
         trimmed.push(id);
-        const final = trimmed.slice(-maxPanels);
         params.delete('stackedNotes');
-        final.forEach((x) => params.append('stackedNotes', x));
-        history.pushState({ stackedNotes: final }, '', url);
+        trimmed.forEach((x) => params.append('stackedNotes', x));
+        history.pushState({ stackedNotes: trimmed }, '', url);
       }
     } catch (err) {
       console.error(err);
       window.location.href = href;
     }
+  }
+
+  function expandCollapsedPane(panelIndex) {
+    // Move the clicked panel to the end (most recent position)
+    setPanels(prev => {
+      const panel = prev[panelIndex];
+      const newPanels = prev.filter((_, i) => i !== panelIndex);
+      return [...newPanels, panel];
+    });
   }
 
   function onClick(e) {
@@ -74,8 +111,11 @@ export default function StackedApp({ initial, maxPanels = 3 }) {
     const href = link.getAttribute('href');
     if (!(href && href.startsWith('/notes/'))) return;
     e.preventDefault();
+
     const panelEl = e.target.closest('.note-panel');
-    const idx = Array.from(ref.current.querySelectorAll('.note-panel')).indexOf(panelEl);
+    const allPanels = Array.from(containerRef.current.querySelectorAll('.note-panel'));
+    const idx = allPanels.indexOf(panelEl);
+
     try { console.info('[Stack] openNote (react):', href); } catch {}
     openNote(href, idx);
   }
@@ -91,10 +131,34 @@ export default function StackedApp({ initial, maxPanels = 3 }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Determine which panels should be collapsed
+  const visiblePanels = panels.length > maxVisiblePanes ?
+    panels.slice(-maxVisiblePanes) : panels;
+  const collapsedCount = panels.length - visiblePanels.length;
+
   return (
-    <div id="stack" className="container" ref={ref} onClick={onClick}>
-      {panels.map((p, i) => (
-        <Panel key={i} title={p.title} body={p.body} index={i} />
+    <div id="stack" className="pane-container" ref={containerRef} onClick={onClick}>
+      {/* Render collapsed panels */}
+      {panels.slice(0, collapsedCount).map((panel, i) => (
+        <Panel
+          key={`collapsed-${i}`}
+          title={panel.title}
+          body={panel.body}
+          index={i}
+          isCollapsed={true}
+          onClick={() => expandCollapsedPane(i)}
+        />
+      ))}
+
+      {/* Render visible panels */}
+      {visiblePanels.map((panel, i) => (
+        <Panel
+          key={`visible-${collapsedCount + i}`}
+          title={panel.title}
+          body={panel.body}
+          index={collapsedCount + i}
+          isCollapsed={false}
+        />
       ))}
     </div>
   );

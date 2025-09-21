@@ -137,7 +137,7 @@
             letter-spacing: 0.6px;
         }
 
-        .container {
+        .container, .pane-container {
             display: flex;
             align-items: stretch;
             height: calc(100vh - 65px);
@@ -146,6 +146,7 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             gap: 0;
+            scroll-behavior: smooth;
         }
 
         .note-panel {
@@ -157,16 +158,45 @@
             position: relative;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 0 0 20px var(--shadow-light);
-            /* Guarantee side-by-side: fixed flex-basis per panel slot */
-            flex: 0 0 var(--panel-width, 52rem);
-            width: var(--panel-width, 52rem);
-            max-width: 90vw;
+            /* Uniform width for all panes */
+            flex: 0 0 600px;
+            width: 600px;
+            min-width: 600px;
         }
 
-        /* Deterministic widths (desktop). Using rem to guarantee columns even on narrow viewports */
-        .note-panel.panel-1 { --panel-width: 56rem; }
-        .note-panel.panel-2 { --panel-width: 42rem; }
-        .note-panel.panel-3 { --panel-width: 34rem; }
+        /* Collapsed panel styling */
+        .note-panel.collapsed {
+            flex: 0 0 60px;
+            width: 60px;
+            min-width: 60px;
+            background: var(--bg-secondary);
+            border-right: 2px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .note-panel.collapsed:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .collapsed-title {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 20px 10px;
+            text-align: center;
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-height: 300px;
+        }
 
         .note-content {
             padding: 48px 60px 40px 40px;
@@ -174,24 +204,6 @@
             position: relative;
         }
 
-        /* Collapsed (leftmost) panel shows vertical title only */
-        .note-panel.collapsed {
-            width: 36px;
-            min-width: 36px;
-            max-width: 36px;
-            overflow: hidden;
-            padding: 0;
-            cursor: pointer;
-        }
-        .note-panel.collapsed .note-content {
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            padding: 8px 6px;
-        }
-        .note-panel.collapsed .note-body,
-        .note-panel.collapsed .note-meta {
-            display: none;
-        }
 
         .note-title {
             font-size: 28px;
@@ -337,8 +349,14 @@
                 -webkit-overflow-scrolling: touch;
             }
 
-            .note-panel { --panel-width: 100vw; width: 100vw; flex-basis: 100vw; }
-            .note-panel.collapsed { display: none; }
+            .note-panel {
+                flex: 0 0 100vw;
+                width: 100vw;
+                min-width: 100vw;
+            }
+            .note-panel.collapsed {
+                display: none;
+            }
             
             .note-content {
                 padding: 32px 20px 20px;

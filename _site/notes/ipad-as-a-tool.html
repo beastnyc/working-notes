@@ -142,11 +142,10 @@
             align-items: stretch;
             height: calc(100vh - 65px);
             width: 100%;
-            min-width: 100vw;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-            gap: 0;
             scroll-behavior: smooth;
+            position: relative;
         }
 
         .note-panel {
@@ -154,48 +153,29 @@
             height: calc(100vh - 65px);
             background: var(--bg-panel);
             border-right: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
             overflow-y: auto;
             position: relative;
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow: 0 0 20px var(--shadow-light);
-            /* Uniform width for all panes */
-            flex: 0 0 600px;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 2px 0 10px var(--shadow-medium);
+            cursor: pointer;
+
+            /* Fixed width for all panels */
             width: 600px;
             min-width: 600px;
+            flex-shrink: 0;
+
+            /* Overlap by reducing margin-left on each subsequent panel */
+            margin-left: -100px;
         }
 
-        /* Collapsed panel styling */
-        .note-panel.collapsed {
-            flex: 0 0 60px;
-            width: 60px;
-            min-width: 60px;
-            background: var(--bg-secondary);
-            border-right: 2px solid var(--border-color);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+        .note-panel:first-child {
+            margin-left: 0;
         }
 
-        .note-panel.collapsed:hover {
-            background: var(--accent-primary);
-            color: white;
-        }
-
-        .collapsed-title {
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-            transform: rotate(180deg);
-            font-size: 14px;
-            font-weight: 600;
-            padding: 20px 10px;
-            text-align: center;
-            line-height: 1.2;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-height: 300px;
+        .note-panel:hover {
+            transform: translateX(5px);
+            box-shadow: 4px 0 20px var(--shadow-medium);
         }
 
         .note-content {
@@ -350,12 +330,14 @@
             }
 
             .note-panel {
-                flex: 0 0 100vw;
                 width: 100vw;
                 min-width: 100vw;
+                margin-left: 0;
+                flex-shrink: 0;
             }
-            .note-panel.collapsed {
-                display: none;
+
+            .note-panel:hover {
+                transform: none;
             }
             
             .note-content {

@@ -5,25 +5,22 @@ function getIdFromHref(href) {
   return m ? m[1] : null;
 }
 
-function Panel({ title, body, index, isCollapsed, onClick }) {
+function Panel({ title, body, index, totalPanels, onClick }) {
   const panelRef = React.useRef(null);
 
-  if (isCollapsed) {
-    return (
-      <div
-        className="note-panel collapsed"
-        onClick={onClick}
-        style={{ cursor: 'pointer' }}
-      >
-        <div className="collapsed-title">
-          {title || 'Note'}
-        </div>
-      </div>
-    );
-  }
+  // Calculate z-index so newer panels appear on top
+  const zIndex = 1000 + index;
 
   return (
-    <div className="note-panel" ref={panelRef}>
+    <div
+      className="note-panel"
+      ref={panelRef}
+      style={{
+        zIndex: zIndex,
+        position: 'relative'
+      }}
+      onClick={onClick}
+    >
       <div className="note-content">
         <h1 className="note-title">{title || 'Note'}</h1>
         <div className="note-body" dangerouslySetInnerHTML={{ __html: body }} />
@@ -32,7 +29,7 @@ function Panel({ title, body, index, isCollapsed, onClick }) {
   );
 }
 
-export default function StackedApp({ initial, maxVisiblePanes = 3 }) {
+export default function StackedApp({ initial }) {
   const [panels, setPanels] = React.useState([initial]);
   const containerRef = React.useRef(null);
 
@@ -43,22 +40,21 @@ export default function StackedApp({ initial, maxVisiblePanes = 3 }) {
     if (root) root.style.display = 'block';
   }, []);
 
-  // Scroll to show the newest pane when a new one is added
+  // Auto-position panels to keep 2 most recent fully visible
   React.useEffect(() => {
-    if (!containerRef.current) return;
-    const container = containerRef.current;
+    if (!containerRef.current || panels.length < 2) return;
 
-    // Smooth scroll to the end to show newest pane
-    setTimeout(() => {
-      const lastPane = container.querySelector('.note-panel:last-child:not(.collapsed)');
-      if (lastPane) {
-        lastPane.scrollIntoView({
-          behavior: 'smooth',
-          inline: 'end',
-          block: 'nearest'
-        });
-      }
-    }, 100);
+    const container = containerRef.current;
+    const panelWidth = 600; // Fixed panel width
+    const overlapAmount = 100; // How much panels overlap
+
+    // Calculate position to show last 2 panels fully
+    const targetScroll = Math.max(0, (panels.length - 2) * (panelWidth - overlapAmount));
+
+    container.scrollTo({
+      left: targetScroll,
+      behavior: 'smooth'
+    });
   }, [panels.length]);
 
   async function openNote(href, baseIndex) {
@@ -75,7 +71,7 @@ export default function StackedApp({ initial, maxVisiblePanes = 3 }) {
       setPanels((prev) => {
         const next = baseIndex != null ? prev.slice(0, baseIndex + 1) : prev.slice();
         next.push({ title, body });
-        return next; // Keep all panels, we'll handle collapsing in render
+        return next; // Keep all panels for layered display
       });
 
       const id = getIdFromHref(href);
@@ -96,7 +92,7 @@ export default function StackedApp({ initial, maxVisiblePanes = 3 }) {
     }
   }
 
-  function expandCollapsedPane(panelIndex) {
+  function bringPanelToFront(panelIndex) {
     // Move the clicked panel to the end (most recent position)
     setPanels(prev => {
       const panel = prev[panelIndex];
@@ -131,33 +127,16 @@ export default function StackedApp({ initial, maxVisiblePanes = 3 }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Determine which panels should be collapsed
-  const visiblePanels = panels.length > maxVisiblePanes ?
-    panels.slice(-maxVisiblePanes) : panels;
-  const collapsedCount = panels.length - visiblePanels.length;
-
   return (
     <div id="stack" className="pane-container" ref={containerRef} onClick={onClick}>
-      {/* Render collapsed panels */}
-      {panels.slice(0, collapsedCount).map((panel, i) => (
+      {panels.map((panel, i) => (
         <Panel
-          key={`collapsed-${i}`}
+          key={`panel-${i}`}
           title={panel.title}
           body={panel.body}
           index={i}
-          isCollapsed={true}
-          onClick={() => expandCollapsedPane(i)}
-        />
-      ))}
-
-      {/* Render visible panels */}
-      {visiblePanels.map((panel, i) => (
-        <Panel
-          key={`visible-${collapsedCount + i}`}
-          title={panel.title}
-          body={panel.body}
-          index={collapsedCount + i}
-          isCollapsed={false}
+          totalPanels={panels.length}
+          onClick={() => bringPanelToFront(i)}
         />
       ))}
     </div>

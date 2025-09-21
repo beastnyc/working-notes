@@ -266,69 +266,101 @@ function buildSite() {
         }
 
         .container, .pane-container {
-            display: flex;
-            align-items: stretch;
+            display: grid;
             height: calc(100vh - 65px);
             width: 100vw;
             overflow: hidden;
             position: relative;
+            gap: 1px;
+        }
+
+        /* Dynamic grid layout based on panel count */
+        .pane-container.panels-1 {
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr;
+        }
+
+        .pane-container.panels-2 {
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr;
+        }
+
+        .pane-container.panels-3 {
+            grid-template-columns: 60px 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            grid-template-areas:
+                "collapsed current previous"
+                "collapsed third third";
+        }
+
+        .pane-container.panels-4,
+        .pane-container.panels-5,
+        .pane-container.panels-6,
+        .pane-container.panels-7,
+        .pane-container.panels-8,
+        .pane-container.panels-9 {
+            grid-template-columns: 60px 60px 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            grid-template-areas:
+                "collapsed1 collapsed2 current previous"
+                "collapsed1 collapsed2 third third";
         }
 
         .note-panel {
             box-sizing: border-box;
-            height: calc(100vh - 65px);
             background: var(--bg-panel);
-            border-right: 1px solid var(--border-color);
+            border: 1px solid var(--border-color);
             overflow-y: auto;
             position: relative;
             transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 2px 0 10px var(--shadow-medium);
-            flex-shrink: 0;
         }
 
-        /* Single panel - takes full width */
+        /* Single panel - takes full grid */
         .note-panel.panel-current {
-            flex: 1;
-            min-width: 400px;
             background: var(--bg-panel);
             cursor: default;
         }
 
-        /* Two panels - equal width split */
-        .note-panel.panel-current-split,
-        .note-panel.panel-previous-split {
-            flex: 1;
+        /* Two panels - positioned in grid */
+        .note-panel.panel-current-split {
             background: var(--bg-panel);
             cursor: default;
+            grid-column: 2;
+            grid-row: 1;
         }
 
         .note-panel.panel-previous-split {
             background: var(--bg-secondary);
             cursor: pointer;
+            grid-column: 1;
+            grid-row: 1;
         }
 
         .note-panel.panel-previous-split:hover {
             background: var(--bg-panel);
         }
 
-        /* Three+ panels - traditional layout */
+        /* Three+ panels - using grid areas */
+        .note-panel.panel-current {
+            grid-area: current;
+        }
+
         .note-panel.panel-previous {
-            width: 300px;
-            min-width: 300px;
             background: var(--bg-secondary);
             cursor: pointer;
+            grid-area: previous;
         }
 
         .note-panel.panel-previous:hover {
             background: var(--bg-panel);
         }
 
-        /* Third panel - not implemented yet, will be same as previous for now */
+        /* Third panel - spans full width below top 2 */
         .note-panel.panel-third {
-            width: 300px;
-            min-width: 300px;
             background: var(--bg-secondary);
             cursor: pointer;
+            grid-area: third;
         }
 
         .note-panel.panel-third:hover {
@@ -337,10 +369,21 @@ function buildSite() {
 
         /* Collapsed panels (all others) - narrow strips with vertical text */
         .note-panel.panel-collapsed {
-            width: 60px;
-            min-width: 60px;
             background: var(--bg-secondary);
             cursor: pointer;
+        }
+
+        /* Position collapsed panels in grid areas */
+        .note-panel.panel-collapsed:nth-of-type(1) {
+            grid-area: collapsed;
+        }
+
+        .note-panel.panel-collapsed:nth-of-type(2) {
+            grid-area: collapsed1;
+        }
+
+        .note-panel.panel-collapsed:nth-of-type(3) {
+            grid-area: collapsed2;
         }
 
         .note-panel.panel-collapsed .note-content {

@@ -149,7 +149,12 @@ export default function StackedApp({ initial }) {
   }, []);
 
   return (
-    <div id="stack" className="pane-container" ref={containerRef} onClick={onClick}>
+    <div
+      id="stack"
+      className={`pane-container panels-${panels.length}`}
+      ref={containerRef}
+      onClick={onClick}
+    >
       {panels.map((panel, i) => (
         <Panel
           key={`panel-${i}`}

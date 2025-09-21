@@ -266,44 +266,11 @@ function buildSite() {
         }
 
         .container, .pane-container {
-            display: grid;
+            display: flex;
             height: calc(100vh - 65px);
             width: 100vw;
             overflow: hidden;
             position: relative;
-            gap: 1px;
-        }
-
-        /* Dynamic grid layout based on panel count */
-        .pane-container.panels-1 {
-            grid-template-columns: 1fr;
-            grid-template-rows: 1fr;
-        }
-
-        .pane-container.panels-2 {
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 1fr;
-        }
-
-        .pane-container.panels-3 {
-            grid-template-columns: 60px 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            grid-template-areas:
-                "collapsed current previous"
-                "collapsed third third";
-        }
-
-        .pane-container.panels-4,
-        .pane-container.panels-5,
-        .pane-container.panels-6,
-        .pane-container.panels-7,
-        .pane-container.panels-8,
-        .pane-container.panels-9 {
-            grid-template-columns: 60px 60px 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            grid-template-areas:
-                "collapsed1 collapsed2 current previous"
-                "collapsed1 collapsed2 third third";
         }
 
         .note-panel {
@@ -316,74 +283,49 @@ function buildSite() {
             box-shadow: 2px 0 10px var(--shadow-medium);
         }
 
-        /* Single panel - takes full grid */
+        /* Andy's layout: horizontal arrangement only */
+
+        /* Single panel - takes full width */
         .note-panel.panel-current {
             background: var(--bg-panel);
             cursor: default;
+            flex: 1;
         }
 
-        /* Two panels - positioned in grid */
+        /* Two panels - equal width split */
         .note-panel.panel-current-split {
             background: var(--bg-panel);
             cursor: default;
-            grid-column: 2;
-            grid-row: 1;
+            flex: 1;
         }
 
         .note-panel.panel-previous-split {
             background: var(--bg-secondary);
             cursor: pointer;
-            grid-column: 1;
-            grid-row: 1;
+            flex: 1;
         }
 
         .note-panel.panel-previous-split:hover {
             background: var(--bg-panel);
         }
 
-        /* Three+ panels - using grid areas */
-        .note-panel.panel-current {
-            grid-area: current;
-        }
-
+        /* Three+ panels - main content panels share space */
         .note-panel.panel-previous {
             background: var(--bg-secondary);
             cursor: pointer;
-            grid-area: previous;
+            flex: 1;
         }
 
         .note-panel.panel-previous:hover {
             background: var(--bg-panel);
         }
 
-        /* Third panel - spans full width below top 2 */
-        .note-panel.panel-third {
-            background: var(--bg-secondary);
-            cursor: pointer;
-            grid-area: third;
-        }
 
-        .note-panel.panel-third:hover {
-            background: var(--bg-panel);
-        }
-
-        /* Collapsed panels (all others) - narrow strips with vertical text */
+        /* Collapsed panels - narrow strips with vertical text */
         .note-panel.panel-collapsed {
             background: var(--bg-secondary);
             cursor: pointer;
-        }
-
-        /* Position collapsed panels in grid areas */
-        .note-panel.panel-collapsed:nth-of-type(1) {
-            grid-area: collapsed;
-        }
-
-        .note-panel.panel-collapsed:nth-of-type(2) {
-            grid-area: collapsed1;
-        }
-
-        .note-panel.panel-collapsed:nth-of-type(3) {
-            grid-area: collapsed2;
+            flex: 0 0 60px; /* Fixed width like Andy's */
         }
 
         .note-panel.panel-collapsed .note-content {

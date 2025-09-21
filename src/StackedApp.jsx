@@ -12,7 +12,7 @@ function Panel({ title, body, index, totalPanels, isActive, onClick }) {
   const positionFromEnd = totalPanels - 1 - index;
   const zIndex = 1000 + index;
 
-  // Determine panel state based on total panels and position
+  // Andy's layout: horizontal only, no stacking
   let panelType = 'collapsed';
 
   if (totalPanels === 1) {
@@ -20,12 +20,11 @@ function Panel({ title, body, index, totalPanels, isActive, onClick }) {
   } else if (totalPanels === 2) {
     panelType = positionFromEnd === 0 ? 'current-split' : 'previous-split'; // Two equal panels
   } else if (totalPanels >= 3) {
+    // Show last 2 panels as main content, all others as collapsed
     if (positionFromEnd === 0) {
       panelType = 'current'; // Rightmost/newest panel
     } else if (positionFromEnd === 1) {
       panelType = 'previous'; // Second from right
-    } else if (positionFromEnd === 2) {
-      panelType = 'third'; // Third panel - stacked below
     } else {
       panelType = 'collapsed'; // All others collapse to narrow strips
     }
@@ -33,7 +32,7 @@ function Panel({ title, body, index, totalPanels, isActive, onClick }) {
 
   const isCollapsed = panelType === 'collapsed';
 
-  // Only collapsed, previous, third, and previous-split panels should be clickable to bring to front
+  // Only collapsed, previous, and previous-split panels should be clickable to bring to front
   const shouldHandleClick = !['current', 'current-split'].includes(panelType);
 
   return (

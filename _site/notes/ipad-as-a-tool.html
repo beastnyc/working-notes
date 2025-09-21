@@ -141,10 +141,8 @@
             display: flex;
             align-items: stretch;
             height: calc(100vh - 65px);
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
+            width: 100vw;
+            overflow: hidden; /* No scrolling - all panels must fit */
             position: relative;
         }
 
@@ -153,29 +151,69 @@
             height: calc(100vh - 65px);
             background: var(--bg-panel);
             border-right: 1px solid var(--border-color);
-            border-left: 1px solid var(--border-color);
             overflow-y: auto;
             position: relative;
             transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 2px 0 10px var(--shadow-medium);
             cursor: pointer;
-
-            /* Fixed width for all panels */
-            width: 600px;
-            min-width: 600px;
             flex-shrink: 0;
-
-            /* Overlap by reducing margin-left on each subsequent panel */
-            margin-left: -100px;
         }
 
-        .note-panel:first-child {
-            margin-left: 0;
+        /* Current panel (rightmost) - takes available space */
+        .note-panel.panel-current {
+            flex: 1;
+            min-width: 400px;
+            background: var(--bg-panel);
+        }
+
+        /* Previous panel (second from right) - medium width */
+        .note-panel.panel-previous {
+            width: 300px;
+            min-width: 300px;
+            background: var(--bg-secondary);
+        }
+
+        /* Collapsed panels (all others) - narrow strips with vertical text */
+        .note-panel.panel-collapsed {
+            width: 60px;
+            min-width: 60px;
+            background: var(--bg-secondary);
+            cursor: pointer;
+        }
+
+        .note-panel.panel-collapsed .note-content {
+            display: none;
+        }
+
+        .collapsed-content {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .collapsed-title {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            transform: rotate(180deg);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-height: 400px;
         }
 
         .note-panel:hover {
-            transform: translateX(5px);
-            box-shadow: 4px 0 20px var(--shadow-medium);
+            background: var(--accent-primary);
+        }
+
+        .note-panel.panel-collapsed:hover .collapsed-title {
+            color: white;
         }
 
         .note-content {
@@ -329,15 +367,27 @@
                 -webkit-overflow-scrolling: touch;
             }
 
-            .note-panel {
-                width: 100vw;
-                min-width: 100vw;
-                margin-left: 0;
-                flex-shrink: 0;
+            .pane-container {
+                overflow-x: auto;
             }
 
-            .note-panel:hover {
-                transform: none;
+            .note-panel.panel-current {
+                flex: 1;
+                min-width: 300px;
+            }
+
+            .note-panel.panel-previous {
+                width: 200px;
+                min-width: 200px;
+            }
+
+            .note-panel.panel-collapsed {
+                width: 40px;
+                min-width: 40px;
+            }
+
+            .collapsed-title {
+                font-size: 12px;
             }
             
             .note-content {

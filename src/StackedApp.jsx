@@ -5,26 +5,44 @@ function getIdFromHref(href) {
   return m ? m[1] : null;
 }
 
-function Panel({ title, body, index, totalPanels, onClick }) {
+function Panel({ title, body, index, totalPanels, isActive, onClick }) {
   const panelRef = React.useRef(null);
 
-  // Calculate z-index so newer panels appear on top
+  // Calculate panel type based on position from the end
+  const positionFromEnd = totalPanels - 1 - index;
   const zIndex = 1000 + index;
+
+  // Determine panel state
+  let panelType = 'full';
+  if (positionFromEnd === 0) {
+    panelType = 'current'; // Rightmost/newest panel
+  } else if (positionFromEnd === 1) {
+    panelType = 'previous'; // Second from right
+  } else {
+    panelType = 'collapsed'; // All others collapse to narrow strips
+  }
+
+  const isCollapsed = panelType === 'collapsed';
 
   return (
     <div
-      className="note-panel"
+      className={`note-panel panel-${panelType}`}
       ref={panelRef}
-      style={{
-        zIndex: zIndex,
-        position: 'relative'
-      }}
+      style={{ zIndex: zIndex }}
       onClick={onClick}
     >
-      <div className="note-content">
-        <h1 className="note-title">{title || 'Note'}</h1>
-        <div className="note-body" dangerouslySetInnerHTML={{ __html: body }} />
-      </div>
+      {isCollapsed ? (
+        <div className="collapsed-content">
+          <div className="collapsed-title">
+            {title || 'Note'}
+          </div>
+        </div>
+      ) : (
+        <div className="note-content">
+          <h1 className="note-title">{title || 'Note'}</h1>
+          <div className="note-body" dangerouslySetInnerHTML={{ __html: body }} />
+        </div>
+      )}
     </div>
   );
 }
@@ -40,22 +58,7 @@ export default function StackedApp({ initial }) {
     if (root) root.style.display = 'block';
   }, []);
 
-  // Auto-position panels to keep 2 most recent fully visible
-  React.useEffect(() => {
-    if (!containerRef.current || panels.length < 2) return;
-
-    const container = containerRef.current;
-    const panelWidth = 600; // Fixed panel width
-    const overlapAmount = 100; // How much panels overlap
-
-    // Calculate position to show last 2 panels fully
-    const targetScroll = Math.max(0, (panels.length - 2) * (panelWidth - overlapAmount));
-
-    container.scrollTo({
-      left: targetScroll,
-      behavior: 'smooth'
-    });
-  }, [panels.length]);
+  // No auto-scrolling needed - all panels always visible with dynamic sizing
 
   async function openNote(href, baseIndex) {
     try {
@@ -136,6 +139,7 @@ export default function StackedApp({ initial }) {
           body={panel.body}
           index={i}
           totalPanels={panels.length}
+          isActive={i === panels.length - 1}
           onClick={() => bringPanelToFront(i)}
         />
       ))}

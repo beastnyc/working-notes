@@ -283,7 +283,6 @@ function buildSite() {
             position: relative;
             transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
             box-shadow: 2px 0 10px var(--shadow-medium);
-            cursor: pointer;
             flex-shrink: 0;
         }
 
@@ -292,6 +291,7 @@ function buildSite() {
             flex: 1;
             min-width: 400px;
             background: var(--bg-panel);
+            cursor: default;
         }
 
         /* Previous panel (second from right) - medium width */
@@ -299,6 +299,11 @@ function buildSite() {
             width: 300px;
             min-width: 300px;
             background: var(--bg-secondary);
+            cursor: pointer;
+        }
+
+        .note-panel.panel-previous:hover {
+            background: var(--bg-panel);
         }
 
         /* Collapsed panels (all others) - narrow strips with vertical text */
@@ -336,7 +341,8 @@ function buildSite() {
             max-height: 400px;
         }
 
-        .note-panel:hover {
+        /* Remove global panel hover - only apply to collapsed panels */
+        .note-panel.panel-collapsed:hover {
             background: var(--accent-primary);
         }
 
@@ -348,6 +354,18 @@ function buildSite() {
             padding: 48px 60px 40px 40px;
             max-width: 100%;
             position: relative;
+        }
+
+        /* Ensure links are properly styled and visible */
+        .note-content a {
+            color: var(--accent-primary);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .note-content a:hover {
+            color: var(--accent-secondary);
+            text-decoration: none;
         }
 
 

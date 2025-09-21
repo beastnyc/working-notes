@@ -24,12 +24,15 @@ function Panel({ title, body, index, totalPanels, isActive, onClick }) {
 
   const isCollapsed = panelType === 'collapsed';
 
+  // Only collapsed and previous panels should be clickable to bring to front
+  const shouldHandleClick = panelType !== 'current';
+
   return (
     <div
       className={`note-panel panel-${panelType}`}
       ref={panelRef}
       style={{ zIndex: zIndex }}
-      onClick={onClick}
+      onClick={shouldHandleClick ? onClick : undefined}
     >
       {isCollapsed ? (
         <div className="collapsed-content">
@@ -105,18 +108,24 @@ export default function StackedApp({ initial }) {
   }
 
   function onClick(e) {
+    // Check if this is a link click first
     const link = e.target.closest && e.target.closest('a[data-note], a.note-link, a[href^="/notes/"]');
-    if (!link) return;
-    const href = link.getAttribute('href');
-    if (!(href && href.startsWith('/notes/'))) return;
-    e.preventDefault();
+    if (link) {
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('/notes/')) {
+        e.preventDefault();
 
-    const panelEl = e.target.closest('.note-panel');
-    const allPanels = Array.from(containerRef.current.querySelectorAll('.note-panel'));
-    const idx = allPanels.indexOf(panelEl);
+        const panelEl = e.target.closest('.note-panel');
+        const allPanels = Array.from(containerRef.current.querySelectorAll('.note-panel'));
+        const idx = allPanels.indexOf(panelEl);
 
-    try { console.info('[Stack] openNote (react):', href); } catch {}
-    openNote(href, idx);
+        try { console.info('[Stack] openNote (react):', href); } catch {}
+        openNote(href, idx);
+        return;
+      }
+    }
+
+    // If not a link click, do nothing - panel onClick handlers will handle bringing to front
   }
 
   React.useEffect(() => {

@@ -12,20 +12,29 @@ function Panel({ title, body, index, totalPanels, isActive, onClick }) {
   const positionFromEnd = totalPanels - 1 - index;
   const zIndex = 1000 + index;
 
-  // Determine panel state
-  let panelType = 'full';
-  if (positionFromEnd === 0) {
-    panelType = 'current'; // Rightmost/newest panel
-  } else if (positionFromEnd === 1) {
-    panelType = 'previous'; // Second from right
-  } else {
-    panelType = 'collapsed'; // All others collapse to narrow strips
+  // Determine panel state based on total panels and position
+  let panelType = 'collapsed';
+
+  if (totalPanels === 1) {
+    panelType = 'current'; // Only one panel
+  } else if (totalPanels === 2) {
+    panelType = positionFromEnd === 0 ? 'current-split' : 'previous-split'; // Two equal panels
+  } else if (totalPanels >= 3) {
+    if (positionFromEnd === 0) {
+      panelType = 'current'; // Rightmost/newest panel
+    } else if (positionFromEnd === 1) {
+      panelType = 'previous'; // Second from right
+    } else if (positionFromEnd === 2) {
+      panelType = 'third'; // Third panel - stacked below
+    } else {
+      panelType = 'collapsed'; // All others collapse to narrow strips
+    }
   }
 
   const isCollapsed = panelType === 'collapsed';
 
-  // Only collapsed and previous panels should be clickable to bring to front
-  const shouldHandleClick = panelType !== 'current';
+  // Only collapsed, previous, third, and previous-split panels should be clickable to bring to front
+  const shouldHandleClick = !['current', 'current-split'].includes(panelType);
 
   return (
     <div

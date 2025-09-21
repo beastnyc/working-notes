@@ -270,7 +270,7 @@ function buildSite() {
             align-items: stretch;
             height: calc(100vh - 65px);
             width: 100vw;
-            overflow: hidden; /* No scrolling - all panels must fit */
+            overflow: hidden;
             position: relative;
         }
 
@@ -286,7 +286,7 @@ function buildSite() {
             flex-shrink: 0;
         }
 
-        /* Current panel (rightmost) - takes available space */
+        /* Single panel - takes full width */
         .note-panel.panel-current {
             flex: 1;
             min-width: 400px;
@@ -294,7 +294,24 @@ function buildSite() {
             cursor: default;
         }
 
-        /* Previous panel (second from right) - medium width */
+        /* Two panels - equal width split */
+        .note-panel.panel-current-split,
+        .note-panel.panel-previous-split {
+            flex: 1;
+            background: var(--bg-panel);
+            cursor: default;
+        }
+
+        .note-panel.panel-previous-split {
+            background: var(--bg-secondary);
+            cursor: pointer;
+        }
+
+        .note-panel.panel-previous-split:hover {
+            background: var(--bg-panel);
+        }
+
+        /* Three+ panels - traditional layout */
         .note-panel.panel-previous {
             width: 300px;
             min-width: 300px;
@@ -303,6 +320,18 @@ function buildSite() {
         }
 
         .note-panel.panel-previous:hover {
+            background: var(--bg-panel);
+        }
+
+        /* Third panel - not implemented yet, will be same as previous for now */
+        .note-panel.panel-third {
+            width: 300px;
+            min-width: 300px;
+            background: var(--bg-secondary);
+            cursor: pointer;
+        }
+
+        .note-panel.panel-third:hover {
             background: var(--bg-panel);
         }
 
@@ -321,7 +350,7 @@ function buildSite() {
         .collapsed-content {
             height: 100%;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             padding: 20px 0;
         }
@@ -329,7 +358,6 @@ function buildSite() {
         .collapsed-title {
             writing-mode: vertical-rl;
             text-orientation: mixed;
-            transform: rotate(180deg);
             font-size: 14px;
             font-weight: 600;
             color: var(--text-muted);

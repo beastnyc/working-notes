@@ -1,0 +1,3 @@
+The thing about vibe coding is that there is a means to it. It's about find a path forward, the opposite end of a spectrum, and its within the experimenttion from amatuers that we find news ways to do something. 
+
+It laso gives people a chance to re enter the early 2000s internet era of geocities. Individualized websites. It brings down the barrier to entry in terms of creation. Making more personal sites and gaurding your information instead of just being on social media sites. 

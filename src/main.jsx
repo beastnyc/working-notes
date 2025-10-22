@@ -7,6 +7,10 @@ function boot() {
   if (!rootEl) return;
   const title = (document.querySelector('.note-title') || {}).textContent || 'Note';
   const body = (document.querySelector('.note-body') || {}).innerHTML || '';
+  const path = window.location.pathname || '/notes/index.html';
+  const match = path.match(/\/notes\/([^/.]+)(?:\.html)?/);
+  const href = match ? `/notes/${match[1]}.html` : '/notes/index.html';
+  const id = match ? match[1] : null;
   // Signal that React is handling stacking; hide static container, show root
   try {
     window.__STACKED_REACT__ = true;
@@ -17,7 +21,7 @@ function boot() {
     if (window.__setStackBadge) window.__setStackBadge('React');
   } catch {}
   createRoot(rootEl).render(
-    React.createElement(StackedApp, { initial: { title, body } })
+    React.createElement(StackedApp, { initial: { title, body, href, id } })
   );
 }
 

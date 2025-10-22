@@ -6,36 +6,40 @@
     <title>Ipad as a Tool - Working Notes</title>
     <link rel="stylesheet" href="/assets/css/style.css">
     <style>
+
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
         :root {
             --bg-primary: #f8f9fa;
             --bg-secondary: #e9ecef;
-            --bg-panel: rgba(255, 255, 255, 0.98);
+            --bg-panel: rgba(255, 255, 255, 0.9);
             --bg-nav: rgba(255, 255, 255, 0.95);
             --text-primary: #1a1a1a;
             --text-secondary: #2d3748;
-            --text-muted: #666;
+            --text-muted: #6b7280;
             --accent-primary: #ff6b35;
             --accent-secondary: #f7931e;
-            --border-color: rgba(0, 0, 0, 0.08);
-            --shadow-light: rgba(0, 0, 0, 0.02);
-            --shadow-medium: rgba(0, 0, 0, 0.1);
+            --border-color: rgba(15, 23, 42, 0.08);
+            --panel-gap: 24px;
+            --panel-radius: 18px;
+            --panel-current-width: clamp(38rem, 58vw, 62rem);
+            --panel-previous-width: clamp(30rem, 46vw, 48rem);
+            --panel-collapsed-width: 58px;
+            --panel-shadow: 0 24px 48px rgba(15, 23, 42, 0.12);
         }
 
         [data-theme="dark"] {
             --bg-primary: #0d1117;
-            --bg-secondary: #161b22;
-            --bg-panel: rgba(33, 38, 45, 0.98);
-            --bg-nav: rgba(33, 38, 45, 0.95);
+            --bg-secondary: #111827;
+            --bg-panel: rgba(30, 35, 42, 0.92);
+            --bg-nav: rgba(24, 29, 39, 0.92);
             --text-primary: #f0f6fc;
             --text-secondary: #c9d1d9;
             --text-muted: #8b949e;
             --accent-primary: #ff6b35;
             --accent-secondary: #f7931e;
-            --border-color: rgba(240, 246, 252, 0.1);
-            --shadow-light: rgba(0, 0, 0, 0.3);
-            --shadow-medium: rgba(0, 0, 0, 0.4);
+            --border-color: rgba(240, 246, 252, 0.08);
+            --panel-shadow: 0 24px 54px rgba(8, 9, 12, 0.55);
         }
 
         * {
@@ -44,7 +48,6 @@
             box-sizing: border-box;
         }
 
-        /* Small on-page mode badge */
         .stack-badge {
             position: fixed;
             top: 8px;
@@ -52,11 +55,11 @@
             z-index: 9999;
             font: 12px/1.2 -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
             color: #111;
-            background: rgba(255,255,255,0.9);
-            border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             border-radius: 6px;
             padding: 6px 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             pointer-events: none;
         }
 
@@ -64,38 +67,32 @@
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             line-height: 1.6;
             color: var(--text-primary);
-            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-            overflow-x: auto;
-            overflow-y: hidden;
+            background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.95), var(--bg-secondary));
             height: 100vh;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s ease;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .top-nav {
             background: var(--bg-nav);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border-color);
-            padding: 12px 20px;
+            padding: 14px clamp(20px, 6vw, 40px);
             flex-shrink: 0;
-            z-index: 100;
+            z-index: 200;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
-        .nav-left {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
+        .nav-left,
         .nav-right {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 20px;
         }
 
         .search-container {
@@ -137,111 +134,124 @@
             letter-spacing: 0.6px;
         }
 
-        .container, .pane-container {
+        .container,
+        .pane-container {
             display: flex;
-            height: calc(100vh - 65px);
-            width: 100vw;
-            overflow: hidden;
+            align-items: stretch;
+            height: calc(100vh - 76px);
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            gap: var(--panel-gap);
+            padding: 24px clamp(24px, 6vw, 64px) 40px;
+            scroll-behavior: smooth;
             position: relative;
+        }
+
+        .container::after,
+        .pane-container::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 80px;
+            pointer-events: none;
+            background: linear-gradient(90deg, rgba(248, 249, 250, 0) 0%, var(--bg-primary) 80%);
         }
 
         .note-panel {
             box-sizing: border-box;
             background: var(--bg-panel);
             border: 1px solid var(--border-color);
+            border-radius: var(--panel-radius);
             overflow-y: auto;
             position: relative;
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow: 2px 0 10px var(--shadow-medium);
+            flex: 0 0 auto;
+            width: var(--panel-previous-width);
+            min-height: calc(100% - 16px);
+            box-shadow: var(--panel-shadow);
+            transition: width 0.35s cubic-bezier(0.19, 1, 0.22, 1), transform 0.35s ease, box-shadow 0.35s ease;
+            backdrop-filter: blur(24px);
         }
 
-        /* Andy's layout: horizontal arrangement only */
-
-        /* Single panel - takes full width */
-        .note-panel.panel-current {
-            background: var(--bg-panel);
-            cursor: default;
-            flex: 1;
-        }
-
-        /* Two panels - equal width split */
+        .note-panel.panel-current,
         .note-panel.panel-current-split {
-            background: var(--bg-panel);
+            width: var(--panel-current-width);
             cursor: default;
-            flex: 1;
         }
 
+        .note-panel.panel-previous,
         .note-panel.panel-previous-split {
-            background: var(--bg-secondary);
+            width: var(--panel-previous-width);
             cursor: pointer;
-            flex: 1;
+            opacity: 0.9;
         }
 
+        .note-panel.panel-previous:hover,
         .note-panel.panel-previous-split:hover {
-            background: var(--bg-panel);
+            opacity: 1;
+            box-shadow: 0 28px 54px rgba(15, 23, 42, 0.18);
         }
 
-        /* Three+ panels - main content panels share space */
-        .note-panel.panel-previous {
-            background: var(--bg-secondary);
+        .note-panel.panel-collapsed,
+        .note-panel.collapsed {
+            flex: 0 0 var(--panel-collapsed-width);
+            width: var(--panel-collapsed-width);
+            min-width: var(--panel-collapsed-width);
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: calc(var(--panel-radius) - 6px);
+            border: 1px solid rgba(148, 163, 184, 0.25);
             cursor: pointer;
-            flex: 1;
+            box-shadow: none;
         }
 
-        .note-panel.panel-previous:hover {
-            background: var(--bg-panel);
-        }
-
-
-        /* Collapsed panels - narrow strips with vertical text */
-        .note-panel.panel-collapsed {
-            background: var(--bg-secondary);
-            cursor: pointer;
-            flex: 0 0 60px; /* Fixed width like Andy's */
-        }
-
-        .note-panel.panel-collapsed .note-content {
+        .note-panel.panel-collapsed .note-content,
+        .note-panel.collapsed .note-content {
             display: none;
+        }
+
+        .note-panel.panel-collapsed:hover,
+        .note-panel.collapsed:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
         }
 
         .collapsed-content {
             height: 100%;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             justify-content: center;
-            padding: 20px 0;
+            padding: 12px 0;
         }
 
         .collapsed-title {
             writing-mode: vertical-rl;
             text-orientation: mixed;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-muted);
             text-align: center;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
             line-height: 1.2;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            max-height: 400px;
+            max-height: 420px;
         }
 
-        /* Remove global panel hover - only apply to collapsed panels */
-        .note-panel.panel-collapsed:hover {
-            background: var(--accent-primary);
-        }
-
-        .note-panel.panel-collapsed:hover .collapsed-title {
-            color: white;
+        .note-panel.panel-collapsed:hover .collapsed-title,
+        .note-panel.collapsed:hover .collapsed-title {
+            color: #fff;
         }
 
         .note-content {
-            padding: 48px 60px 40px 40px;
+            padding: 56px clamp(32px, 4vw, 68px) 48px clamp(32px, 4vw, 48px);
             max-width: 100%;
             position: relative;
         }
 
-        /* Ensure links are properly styled and visible */
         .note-content a {
             color: var(--accent-primary);
             text-decoration: underline;
@@ -253,35 +263,34 @@
             text-decoration: none;
         }
 
-
         .note-title {
             font-size: 28px;
             font-weight: 700;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
             color: var(--text-primary);
             line-height: 1.2;
             position: relative;
-            text-transform: uppercase;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.4px;
             padding-right: 60px;
+            text-transform: uppercase;
         }
 
         .note-title::after {
             content: '';
             position: absolute;
-            bottom: -8px;
+            bottom: -10px;
             left: 0;
-            width: 40px;
+            width: 64px;
             height: 3px;
             background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
         }
 
         .note-body {
             font-size: 16px;
-            line-height: 1.7;
+            line-height: 1.72;
+            max-width: 48rem;
         }
 
-        /* Make embedded media responsive */
         .note-body img,
         .note-body video {
             max-width: 100%;
@@ -302,20 +311,21 @@
         .note-body h2 {
             font-size: 20px;
             font-weight: 600;
-            margin: 32px 0 16px;
+            margin: 36px 0 16px;
             color: var(--text-primary);
         }
 
         .note-body h3 {
             font-size: 18px;
             font-weight: 600;
-            margin: 24px 0 12px;
+            margin: 28px 0 12px;
             color: var(--text-primary);
         }
 
-        .note-body ul, .note-body ol {
-            margin-bottom: 16px;
-            padding-left: 24px;
+        .note-body ul,
+        .note-body ol {
+            margin-bottom: 18px;
+            padding-left: 26px;
         }
 
         .note-body li {
@@ -338,48 +348,47 @@
             display: flex;
             align-items: center;
             gap: 16px;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            margin-top: 36px;
+            padding-top: 28px;
+            border-top: 1px solid rgba(15, 23, 42, 0.08);
             font-size: 12px;
             color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
         }
 
         .last-modified {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
 
         .intersection-tags {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             flex-wrap: wrap;
         }
 
         .intersection-tag {
             background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
-            color: white;
-            padding: 2px 6px;
-            border-radius: 8px;
-            font-size: 9px;
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.4px;
         }
 
-        /* Mobile-first responsive design */
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .top-nav {
-                padding: 8px 16px;
+                padding: 12px 18px;
                 flex-direction: column;
-                gap: 8px;
+                gap: 10px;
                 height: auto;
             }
 
-            .nav-left, .nav-right {
+            .nav-left,
+            .nav-right {
                 width: 100%;
                 justify-content: space-between;
             }
@@ -392,44 +401,46 @@
                 width: 180px;
             }
 
-            .container {
-                height: calc(100vh - 80px);
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-
+            .container,
             .pane-container {
-                overflow-x: auto;
+                height: auto;
+                padding: 20px;
+                flex-direction: column;
+                overflow-x: hidden;
+                overflow-y: auto;
+                gap: 20px;
             }
 
-            .note-panel.panel-current {
-                flex: 1;
-                min-width: 300px;
+            .container::after,
+            .pane-container::after {
+                display: none;
             }
 
-            .note-panel.panel-previous {
-                width: 200px;
-                min-width: 200px;
+            .note-panel,
+            .note-panel.panel-current,
+            .note-panel.panel-previous,
+            .note-panel.panel-current-split,
+            .note-panel.panel-previous-split {
+                width: 100%;
+                min-width: auto;
+                flex: 1 1 auto;
             }
 
-            .note-panel.panel-collapsed {
-                width: 40px;
-                min-width: 40px;
+            .note-panel.panel-collapsed,
+            .note-panel.collapsed {
+                display: none;
             }
 
-            .collapsed-title {
-                font-size: 12px;
-            }
-            
             .note-content {
-                padding: 32px 20px 20px;
+                padding: 32px 24px 28px 24px;
             }
 
             .note-title {
                 font-size: 24px;
-                padding-right: 50px;
+                padding-right: 42px;
             }
         }
+
     </style>
 </head>
 <body>
@@ -444,7 +455,7 @@
     </div>
     <!-- Static fallback container (hidden once React mounts) -->
     <div class="container" id="container">
-        <div class="note-panel panel-1">
+        <div class="note-panel panel-current">
             <div class="note-content">
                 <h1 class="note-title">Ipad as a Tool</h1>
                 <div class="note-body"><p>One thing you know about me is <a href="/notes/knowledge-work.html" class="note-link" data-note="knowledge-work">Knowledge Work</a></p>
@@ -620,19 +631,29 @@
             });
             function relabelPanels() {
                 const panels = Array.from(container.querySelectorAll('.note-panel'));
-                panels.forEach(p => p.classList.remove('panel-1','panel-2','panel-3'));
-                const fullPanels = panels.filter(p => !p.classList.contains('collapsed'));
-                const lastThree = fullPanels.slice(-3);
-                if (lastThree.length === 3) {
-                    lastThree[0].classList.add('panel-1');
-                    lastThree[1].classList.add('panel-2');
-                    lastThree[2].classList.add('panel-3');
-                } else if (lastThree.length === 2) {
-                    lastThree[0].classList.add('panel-1');
-                    lastThree[1].classList.add('panel-2');
-                } else if (lastThree.length === 1) {
-                    lastThree[0].classList.add('panel-1');
-                }
+                const states = ['panel-current','panel-current-split','panel-previous','panel-previous-split','panel-collapsed'];
+                panels.forEach(panel => {
+                    states.forEach(cls => panel.classList.remove(cls));
+                    panel.classList.remove('collapsed');
+                });
+                const total = panels.length;
+                panels.forEach((panel, index) => {
+                    const positionFromEnd = total - 1 - index;
+                    let type = 'collapsed';
+                    if (total === 1) {
+                        type = 'current';
+                    } else if (total === 2) {
+                        type = positionFromEnd === 0 ? 'current-split' : 'previous-split';
+                    } else if (total >= 3) {
+                        if (positionFromEnd === 0) {
+                            type = 'current';
+                        } else if (positionFromEnd === 1) {
+                            type = 'previous';
+                        }
+                    }
+                    panel.classList.add('panel-' + type);
+                    if (type === 'collapsed') panel.classList.add('collapsed');
+                });
             }
         })();
     </script>
